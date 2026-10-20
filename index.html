@@ -5,9 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>PhantomGuard</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#02060b;--card:rgba(6,15,26,.74);--ink:#eef7ff;--mute:#8ea8ba;--pink:#b6ffd8;--vio:#2f7dff;--cy:#7fd4ff;--ok:#8dffc4;--warn:#f2f9ff;--bad:#ff6b7d;--mx:50%;--my:50%}
+:root{
+  --bg:#04070b;--card:rgba(10,18,26,.72);
+  --ink:#eef7fb;--mute:#7e97a8;
+  --blue:#2ea8ff;--blue-deep:#0a5cff;--ice:#9fe9ff;
+  --green:#7dffb8;--green-dim:#3fd693;
+  --warn:#ffc14d;--bad:#ff6b7a;
+  --mx:50%;--my:50%;
+}
 *{box-sizing:border-box}
 html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Manrope,"Segoe UI",system-ui,sans-serif;overflow-x:hidden;min-height:100vh}
@@ -15,137 +23,178 @@ h1,h2,h3,.disp{font-family:"Big Shoulders Display",Impact,"Arial Narrow",sans-se
 .hidden{display:none!important}
 .mute{color:var(--mute);font-size:.85rem}
 
-/* aurora */
-.aurora{position:fixed;inset:0;z-index:-1;overflow:hidden}
-.aurora i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55;animation:drift 20s ease-in-out infinite alternate}
-.aurora::after{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 50% 110%,rgba(220,245,255,.10),transparent 60%);animation:fog 9s ease-in-out infinite alternate}
-@keyframes fog{to{opacity:.35;transform:translateY(-3%)}}
-.aurora i:nth-child(1){width:55vw;height:55vw;background:#0b44b8;left:-10vw;top:-15vw}
-.aurora i:nth-child(2){width:45vw;height:45vw;background:#17a07c;right:-12vw;top:10vh;animation-duration:26s;animation-delay:-6s}
-.aurora i:nth-child(3){width:50vw;height:50vw;background:#2f7dff;left:25vw;bottom:-25vw;animation-duration:23s;animation-delay:-11s}
-@keyframes drift{to{transform:translate(8vw,6vh) scale(1.2)}}
+/* ------- background glows ------- */
+.aurora{position:fixed;inset:0;z-index:-2;overflow:hidden}
+.aurora i{position:absolute;border-radius:50%;filter:blur(100px);opacity:.5;animation:drift 22s ease-in-out infinite alternate}
+.aurora i:nth-child(1){width:55vw;height:55vw;background:#0b3a8a;left:-10vw;top:-15vw}
+.aurora i:nth-child(2){width:45vw;height:45vw;background:#0a6b7a;right:-12vw;top:8vh;animation-duration:28s;animation-delay:-6s}
+.aurora i:nth-child(3){width:50vw;height:50vw;background:#134a5c;left:25vw;bottom:-25vw;animation-duration:24s;animation-delay:-11s}
+@keyframes drift{to{transform:translate(7vw,5vh) scale(1.18)}}
 
-/* cards: gradient edge + cursor spotlight */
-.card{position:relative;background:var(--card);border-radius:20px;padding:1.4rem;backdrop-filter:blur(10px);isolation:isolate;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
-.card::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(135deg,var(--pink),var(--vio) 50%,var(--cy));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none}
-.card::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(260px circle at var(--mx) var(--my),rgba(47,125,255,.22),transparent 70%);opacity:0;transition:opacity .3s;pointer-events:none;z-index:-1}
+/* ------- rising spectral fog (visibly moves up and down) ------- */
+.fog{
+  position:fixed;inset:auto 0 0 0;height:70vh;z-index:-1;pointer-events:none;overflow:hidden;
+  -webkit-mask-image:linear-gradient(to top,transparent 0%,#000 10%,#000 60%,rgba(0,0,0,.55) 82%,transparent 100%);
+          mask-image:linear-gradient(to top,transparent 0%,#000 10%,#000 60%,rgba(0,0,0,.55) 82%,transparent 100%);
+}
+.fog i{
+  position:absolute;left:-15%;right:-15%;bottom:-22%;height:135%;
+  filter:blur(42px);will-change:transform,opacity;pointer-events:none;
+}
+.fog .f1{
+  background:
+    radial-gradient(58% 62% at 32% 100%,rgba(159,233,255,.24),transparent 68%),
+    radial-gradient(46% 52% at 78% 100%,rgba(46,168,255,.16),transparent 70%);
+  animation:fogRise 17s ease-in-out infinite;
+}
+.fog .f2{
+  background:
+    radial-gradient(52% 56% at 68% 100%,rgba(125,255,184,.18),transparent 70%),
+    radial-gradient(42% 48% at 22% 100%,rgba(159,233,255,.11),transparent 72%);
+  animation:fogRise 23s ease-in-out infinite;animation-delay:-7s;
+}
+.fog .f3{
+  background:radial-gradient(70% 78% at 50% 100%,rgba(220,245,255,.10),transparent 72%);
+  animation:fogRise 29s ease-in-out infinite;animation-delay:-13s;
+}
+@keyframes fogRise{
+  0%  {transform:translate3d(-3%,10%,0) scale(1);   opacity:.72}
+  50% {transform:translate3d( 3%,-9%,0) scale(1.09);opacity:1}
+  100%{transform:translate3d(-3%,10%,0) scale(1);   opacity:.72}
+}
+
+/* ------- cards ------- */
+.card{position:relative;background:var(--card);border-radius:20px;padding:1.4rem;backdrop-filter:blur(10px);isolation:isolate;transition:transform .35s cubic-bezier(.2,.8,.2,1),opacity .5s,filter .5s}
+.card::before{content:"";position:absolute;inset:0;border-radius:inherit;padding:1px;background:linear-gradient(135deg,rgba(46,168,255,.85),rgba(125,255,184,.7) 60%,rgba(159,233,255,.6));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;opacity:.55;transition:opacity .4s}
+.card::after{content:"";position:absolute;inset:0;border-radius:inherit;background:radial-gradient(280px circle at var(--mx) var(--my),rgba(46,168,255,.2),transparent 70%);opacity:0;transition:opacity .3s;pointer-events:none;z-index:-1}
 .card:hover{transform:translateY(-3px)}
+.card:hover::before{opacity:1}
 .card:hover::after{opacity:1}
-.card h2{font-size:1.5rem;margin-bottom:1rem}
+.card.stale{opacity:.45;filter:saturate(.55)}
+.card h2{font-size:1.5rem;margin-bottom:1rem;display:flex;align-items:center;gap:.6rem}
+.card h2 .tag{font:800 .62rem Manrope,sans-serif;letter-spacing:.12em;color:var(--mute);border:1px solid rgba(120,190,230,.25);padding:.15rem .5rem;border-radius:99px;text-transform:uppercase}
 
-/* header */
 header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem;gap:1rem;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:.7rem}
 .brand h1{font-size:1.7rem}
-.dot{width:12px;height:12px;border-radius:50%;background:var(--bad);position:relative}
-.dot.on{background:var(--ok)}
-.dot.on::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--ok);animation:ping 1.8s infinite}
+.dot{width:12px;height:12px;border-radius:50%;background:#3a4a55;position:relative;transition:background .5s}
+.dot.init{background:var(--ice);animation:spinPulse 1.4s ease-in-out infinite}
+.dot.live{background:var(--green)}
+.dot.live::after{content:"";position:absolute;inset:0;border-radius:50%;background:var(--green);animation:ping 1.8s infinite}
+.dot.wait{background:var(--warn);animation:blink 1s steps(2,end) infinite}
+.dot.off{background:var(--bad)}
 @keyframes ping{to{transform:scale(3.2);opacity:0}}
+@keyframes blink{50%{opacity:.25}}
+@keyframes spinPulse{50%{box-shadow:0 0 14px var(--ice);transform:scale(1.2)}}
 
-/* buttons */
-button{font:700 .9rem Manrope,sans-serif;cursor:pointer;color:var(--ink);background:rgba(255,255,255,.05);border:1px solid rgba(142,168,186,.35);padding:.7rem 1.2rem;border-radius:999px;position:relative;overflow:hidden;transition:transform .15s,border-color .25s,box-shadow .25s,background .25s}
-button:hover:not(:disabled){border-color:var(--cy);box-shadow:0 0 22px rgba(127,212,255,.35)}
+button{font:700 .9rem Manrope,sans-serif;cursor:pointer;color:var(--ink);background:rgba(255,255,255,.05);border:1px solid rgba(120,190,230,.3);padding:.7rem 1.2rem;border-radius:999px;position:relative;overflow:hidden;transition:transform .15s,border-color .25s,box-shadow .25s,background .25s,opacity .3s}
+button:hover:not(:disabled){border-color:var(--ice);box-shadow:0 0 22px rgba(46,168,255,.4)}
 button:active:not(:disabled){transform:scale(.95)}
-button:focus-visible{outline:2px solid var(--cy);outline-offset:3px}
-button:disabled{opacity:.35;cursor:not-allowed}
-button.primary{background:linear-gradient(120deg,var(--vio),var(--pink));border-color:transparent;color:#021018}
-button.primary:hover:not(:disabled){box-shadow:0 0 26px rgba(182,255,216,.55)}
-button.danger:hover:not(:disabled){border-color:var(--bad);box-shadow:0 0 22px rgba(255,107,125,.4)}
-.rip{position:absolute;border-radius:50%;background:rgba(255,255,255,.45);transform:scale(0);animation:rip .6s ease-out forwards;pointer-events:none}
+button:focus-visible{outline:2px solid var(--ice);outline-offset:3px}
+button:disabled{opacity:.32;cursor:not-allowed}
+button.primary{background:linear-gradient(120deg,var(--blue-deep),var(--blue));border-color:transparent;color:#fff}
+button.primary:hover:not(:disabled){box-shadow:0 0 26px rgba(46,168,255,.6)}
+button.danger:hover:not(:disabled){border-color:var(--bad);box-shadow:0 0 22px rgba(255,107,122,.4)}
+.rip{position:absolute;border-radius:50%;background:rgba(255,255,255,.4);transform:scale(0);animation:rip .6s ease-out forwards;pointer-events:none}
 @keyframes rip{to{transform:scale(4);opacity:0}}
 
-/* hero */
 main{max-width:1120px;margin:0 auto;padding:0 1.5rem 3rem;display:grid;gap:1.25rem;grid-template-columns:repeat(12,1fr)}
-.hero{grid-column:1/-1;display:grid;grid-template-columns:minmax(260px,380px) 1fr;gap:2rem;align-items:center;padding:1rem 0 1.5rem}
+.hero{grid-column:1/-1;display:grid;grid-template-columns:minmax(260px,380px) 1fr;gap:2rem;align-items:center;padding:1rem 0 1.5rem;transition:opacity .5s}
+.hero.stale{opacity:.45}
+.hero.transition-flash{animation:flash .6s ease-out}
+@keyframes flash{0%,100%{filter:none}50%{filter:brightness(1.35)}}
 .state{font-size:clamp(2.8rem,8vw,5.6rem);transition:color .5s}
-.state.hot{color:#e2fff2;text-shadow:0 0 40px rgba(182,255,216,.7)}
+.state.hot{color:var(--green);text-shadow:0 0 46px rgba(125,255,184,.55)}
+.state.init{color:var(--mute)}
 .sub{margin:.8rem 0 1rem;font-size:1.1rem;color:var(--mute)}
 .pills{display:flex;gap:.6rem;flex-wrap:wrap}
-.pill{padding:.25rem .85rem;border-radius:999px;font-size:.8rem;font-weight:800;border:1px solid rgba(142,168,186,.4);transition:all .4s}
-.pill.ok{color:var(--ok);border-color:var(--ok);box-shadow:0 0 14px rgba(141,255,196,.3)}
-.pill.warn{color:var(--warn);border-color:var(--warn);box-shadow:0 0 14px rgba(242,249,255,.3)}
+.pill{padding:.25rem .85rem;border-radius:999px;font-size:.8rem;font-weight:800;border:1px solid rgba(120,190,230,.35);transition:all .4s}
+.pill.ok{color:var(--green);border-color:var(--green);box-shadow:0 0 14px rgba(125,255,184,.3)}
+.pill.warn{color:var(--warn);border-color:var(--warn);box-shadow:0 0 14px rgba(255,193,77,.3)}
 .pill.bad{color:var(--bad);border-color:var(--bad)}
+.pill.idle{color:var(--mute)}
 
-/* radar orb */
-.orb{position:relative;width:min(80vw,360px);aspect-ratio:1;margin:auto;border-radius:50%;background:radial-gradient(circle,rgba(47,125,255,.28),rgba(2,6,11,.92) 70%);box-shadow:0 0 70px rgba(47,125,255,.45),inset 0 0 50px rgba(127,212,255,.15);transition:filter .6s,box-shadow .6s}
-.orb.hot{box-shadow:0 0 90px rgba(182,255,216,.6),inset 0 0 60px rgba(182,255,216,.2)}
-.orb.off{filter:grayscale(1) brightness(.5)}
-.orb .ring{position:absolute;inset:0;margin:auto;border-radius:50%;border:1px solid rgba(142,168,186,.28)}
+.orb{position:relative;width:min(80vw,360px);aspect-ratio:1;margin:auto;border-radius:50%;background:radial-gradient(circle,rgba(46,168,255,.22),rgba(4,7,11,.92) 70%);box-shadow:0 0 70px rgba(46,168,255,.4),inset 0 0 50px rgba(159,233,255,.12);transition:filter .6s,box-shadow .6s}
+.orb.hot{box-shadow:0 0 90px rgba(125,255,184,.55),inset 0 0 60px rgba(125,255,184,.15)}
+.orb.off{filter:grayscale(1) brightness(.45)}
+.orb .ring{position:absolute;inset:0;margin:auto;border-radius:50%;border:1px solid rgba(120,190,230,.22)}
 .orb .r1{width:75%;height:75%}.orb .r2{width:50%;height:50%}.orb .r3{width:25%;height:25%}
-.orb::before,.orb::after{content:"";position:absolute;background:rgba(142,168,186,.18)}
+.orb::before,.orb::after{content:"";position:absolute;background:rgba(120,190,230,.15)}
 .orb::before{left:50%;top:0;bottom:0;width:1px}.orb::after{top:50%;left:0;right:0;height:1px}
-.sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,transparent 0 290deg,rgba(127,212,255,.6) 360deg);animation:spin 4s linear infinite;transition:opacity .5s}
-.orb.hot .sweep{background:conic-gradient(from 0deg,transparent 0 290deg,rgba(182,255,216,.7) 360deg)}
-.orb.off .sweep{animation-play-state:paused;opacity:.2}
+.sweep{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,transparent 0 290deg,rgba(159,233,255,.55) 360deg);animation:spin 4s linear infinite;transition:opacity .5s}
+.orb.hot .sweep{background:conic-gradient(from 0deg,transparent 0 290deg,rgba(125,255,184,.6) 360deg)}
+.orb.off .sweep{animation-play-state:paused;opacity:.15}
 @keyframes spin{to{transform:rotate(360deg)}}
-.blip{position:absolute;width:16px;height:16px;margin:-8px;border-radius:50%;background:var(--pink);box-shadow:0 0 22px 6px rgba(182,255,216,.8);left:50%;top:50%;opacity:0;transition:left 1.2s cubic-bezier(.2,.8,.2,1),top 1.2s cubic-bezier(.2,.8,.2,1),opacity .6s}
-.blip::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--pink);animation:ping 1.6s infinite}
+.blip{position:absolute;width:16px;height:16px;margin:-8px;border-radius:50%;background:var(--green);box-shadow:0 0 22px 6px rgba(125,255,184,.75);left:50%;top:50%;opacity:0;transition:left 1.2s cubic-bezier(.2,.8,.2,1),top 1.2s cubic-bezier(.2,.8,.2,1),opacity .6s}
+.blip::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid var(--green);animation:ping 1.6s infinite}
 .orb.hot .blip{opacity:1}
-.core{position:absolute;inset:0;margin:auto;width:14%;height:14%;border-radius:50%;background:var(--cy);box-shadow:0 0 24px var(--cy);animation:breathe 3s ease-in-out infinite}
+.core{position:absolute;inset:0;margin:auto;width:14%;height:14%;border-radius:50%;background:var(--ice);box-shadow:0 0 24px var(--ice);animation:breathe 3s ease-in-out infinite}
 @keyframes breathe{50%{transform:scale(1.35);opacity:.7}}
 .orb .dist{position:absolute;left:0;right:0;bottom:-2.3rem;text-align:center;font:900 1.4rem "Big Shoulders Display",Impact,sans-serif;letter-spacing:.04em}
 
-/* control */
 .c-ctrl{grid-column:span 7}
 .c-pres{grid-column:span 5}
 .c-time{grid-column:span 7}
 .c-health{grid-column:span 5}
 .c-log{grid-column:1/-1}
 .power{display:flex;align-items:center;gap:1rem;margin-bottom:1.1rem}
-.bulb{width:58px;height:58px;border-radius:50%;background:#0c1a2a;border:2px solid #25425f;transition:all .6s;position:relative;flex:none}
-.bulb.on{background:radial-gradient(circle,#ffffff,#bfe6ff);border-color:var(--warn);box-shadow:0 0 40px 8px rgba(242,249,255,.55)}
+.bulb{width:58px;height:58px;border-radius:50%;background:#0b1520;border:2px solid #1f3346;transition:all .6s;position:relative;flex:none}
+.bulb.on{background:radial-gradient(circle,#eafff5,var(--green));border-color:var(--green);box-shadow:0 0 40px 8px rgba(125,255,184,.5)}
 .power b{font:900 2.2rem "Big Shoulders Display",Impact,sans-serif;text-transform:uppercase;display:block;line-height:1}
 .row{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.8rem}
-.banner{background:rgba(242,249,255,.12);border:1px solid var(--warn);color:var(--warn);padding:.7rem 1rem;border-radius:12px;margin-bottom:1rem;animation:shake .6s}
+.banner{background:rgba(255,193,77,.12);border:1px solid var(--warn);color:var(--warn);padding:.7rem 1rem;border-radius:12px;margin-bottom:1rem;animation:shake .6s}
 @keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
 
-/* bars + rings */
-.bar{height:10px;background:rgba(255,255,255,.07);border-radius:9px;overflow:hidden;margin:.3rem 0 1rem}
-.bar i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,var(--vio),var(--cy));transition:width .8s cubic-bezier(.2,.8,.2,1)}
-.bar.s i{background:linear-gradient(90deg,var(--pink),var(--warn))}
+.bar{height:10px;background:rgba(255,255,255,.06);border-radius:9px;overflow:hidden;margin:.3rem 0 1rem}
+.bar i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,var(--blue-deep),var(--ice));transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.bar.s i{background:linear-gradient(90deg,var(--green-dim),var(--green))}
 .rings{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:1rem}
 .tr{text-align:center}
 .tr svg{width:84px;height:84px;transform:rotate(-90deg)}
 .tr circle{fill:none;stroke-width:6;stroke-linecap:round}
-.tr .bg{stroke:rgba(255,255,255,.08)}
+.tr .bg{stroke:rgba(255,255,255,.07)}
 .tr .fg{stroke:url(#g);stroke-dasharray:163.4;stroke-dashoffset:163.4;transition:stroke-dashoffset 1s linear}
 .tr .v{display:block;margin-top:-62px;height:62px;font:900 1.5rem/62px "Big Shoulders Display",Impact,sans-serif}
 .tr .mute{display:block;margin-top:.4rem}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .grid2 b{display:block;font:900 1.7rem "Big Shoulders Display",Impact,sans-serif}
 
-/* log */
-ul.tl{list-style:none;margin:0;padding:0 0 0 1.2rem;border-left:2px solid rgba(142,168,186,.25);max-height:380px;overflow:auto}
+ul.tl{list-style:none;margin:0;padding:0 0 0 1.2rem;border-left:2px solid rgba(120,190,230,.2);max-height:380px;overflow:auto}
 ul.tl li{padding:.5rem 0 .5rem 1rem;position:relative}
-ul.tl li::before{content:"";position:absolute;left:-1.7rem;top:.95rem;width:12px;height:12px;border-radius:50%;background:var(--cy);box-shadow:0 0 12px var(--cy)}
-ul.tl li.ok::before{background:var(--ok);box-shadow:0 0 12px var(--ok)}
+ul.tl li::before{content:"";position:absolute;left:-1.7rem;top:.95rem;width:12px;height:12px;border-radius:50%;background:var(--blue);box-shadow:0 0 12px var(--blue)}
+ul.tl li.ok::before{background:var(--green);box-shadow:0 0 12px var(--green)}
 ul.tl li.bad::before{background:var(--bad);box-shadow:0 0 12px var(--bad)}
 ul.tl li.new{animation:slide .7s cubic-bezier(.2,.8,.2,1)}
-@keyframes slide{from{opacity:0;transform:translateX(-24px);background:rgba(47,125,255,.3)}}
+@keyframes slide{from{opacity:0;transform:translateX(-24px);background:rgba(46,168,255,.18)}}
 
-/* load sequence */
 .in{animation:rise .9s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0)*90ms)}
 @keyframes rise{from{opacity:0;transform:translateY(28px) scale(.97)}}
 
-/* login */
 #login{min-height:88vh;display:grid;place-items:center;text-align:center;padding:1.5rem}
-#login h1{font-size:clamp(3.5rem,14vw,8rem);background:linear-gradient(100deg,#fff,#bfe0ff 40%,var(--pink));-webkit-background-clip:text;background-clip:text;color:transparent}
+#login h1{font-size:clamp(3.5rem,14vw,8rem);background:linear-gradient(100deg,#fff,#bfe9ff 40%,var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
 #login p{max-width:420px;margin:1rem auto 1.6rem;color:var(--mute)}
 #loginErr{color:var(--bad)!important;min-height:1.5em}
 
 #toasts{position:fixed;right:1rem;bottom:1rem;display:grid;gap:.6rem;z-index:20}
-.toast{background:rgba(6,15,26,.96);border:1px solid var(--cy);padding:.8rem 1.1rem;border-radius:14px;max-width:320px;animation:tin .5s cubic-bezier(.2,1.2,.4,1);box-shadow:0 10px 40px rgba(0,0,0,.5)}
-.toast.bad{border-color:var(--bad)}.toast.ok{border-color:var(--ok)}
+.toast{background:rgba(10,18,26,.96);border:1px solid var(--blue);padding:.8rem 1.1rem;border-radius:14px;max-width:320px;animation:tin .5s cubic-bezier(.2,1.2,.4,1);box-shadow:0 10px 40px rgba(0,0,0,.5)}
+.toast.bad{border-color:var(--bad)}.toast.ok{border-color:var(--green)}
 .toast.out{animation:tout .4s forwards}
 @keyframes tin{from{opacity:0;transform:translateX(60px) scale(.9)}}
 @keyframes tout{to{opacity:0;transform:translateX(60px)}}
 
-@media (max-width:820px){.hero{grid-template-columns:1fr;text-align:center}.pills{justify-content:center}.c-ctrl,.c-pres,.c-time,.c-health{grid-column:1/-1}.orb{margin-bottom:2.6rem}}
-@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+@media (max-width:820px){
+  .hero{grid-template-columns:1fr;text-align:center}.pills{justify-content:center}
+  .c-ctrl,.c-pres,.c-time,.c-health{grid-column:1/-1}.orb{margin-bottom:2.6rem}
+  .fog{height:55vh}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
 </style>
 </head>
 <body>
 <div class="aurora"><i></i><i></i><i></i></div>
+<div class="fog" aria-hidden="true"><i class="f1"></i><i class="f2"></i><i class="f3"></i></div>
 
 <div id="login">
   <div>
@@ -158,12 +207,12 @@ ul.tl li.new{animation:slide .7s cubic-bezier(.2,.8,.2,1)}
 
 <div id="app" class="hidden">
   <header class="in">
-    <div class="brand"><span class="dot" id="hbDot"></span><h1>PhantomGuard</h1><span class="mute" id="hbText">Connecting…</span></div>
+    <div class="brand"><span class="dot init" id="hbDot"></span><h1>PhantomGuard</h1><span class="mute" id="hbText">Initializing…</span></div>
     <div><span class="mute" id="who"></span> <button id="signout">Sign out</button></div>
   </header>
 
   <main>
-    <div class="hero">
+    <div class="hero" id="hero">
       <div class="in" style="--i:1">
         <div class="orb off" id="orb">
           <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
@@ -172,39 +221,43 @@ ul.tl li.new{animation:slide .7s cubic-bezier(.2,.8,.2,1)}
         </div>
       </div>
       <div class="in" style="--i:2">
-        <h2 class="state" id="presTxt">Listening…</h2>
-        <p class="sub" id="relayLine">Waiting for the device.</p>
-        <div class="pills"><span class="pill" id="modePill">–</span><span class="pill" id="outPill">OUT pin</span><span class="pill" id="radarPill">Radar</span></div>
+        <h2 class="state init" id="presTxt">Initializing…</h2>
+        <p class="sub" id="relayLine">Waiting for the device to check in.</p>
+        <div class="pills">
+          <span class="pill idle" id="modePill">–</span>
+          <span class="pill idle" id="outPill">–</span>
+          <span class="pill idle" id="radarPill">–</span>
+        </div>
       </div>
     </div>
 
-    <section class="card c-ctrl in" style="--i:3">
+    <section class="card c-ctrl in" style="--i:3" id="cardCtrl">
       <h2>Control</h2>
       <div id="radarWarn" class="banner hidden">Radar disconnected. System is running on manual fallback.</div>
-      <div class="power"><div class="bulb" id="bulb"></div><div><b id="relayTxt">–</b><span class="mute" id="modeHint"></span></div></div>
+      <div class="power"><div class="bulb" id="bulb"></div><div><b id="relayTxt">Initializing…</b><span class="mute" id="modeHint"></span></div></div>
       <div class="row">
-        <button class="primary" id="bAuto">Auto mode</button>
-        <button id="bOverride">Manual override</button>
+        <button class="primary" id="bAuto" disabled>Auto mode</button>
+        <button id="bOverride" disabled>Manual override</button>
       </div>
       <div class="row">
-        <button id="bOn">Turn ON</button>
-        <button class="danger" id="bOff">Turn OFF</button>
+        <button id="bOn" disabled>Turn ON</button>
+        <button class="danger" id="bOff" disabled>Turn OFF</button>
       </div>
     </section>
 
-    <section class="card c-pres in" style="--i:4">
+    <section class="card c-pres in" style="--i:4" id="cardPres">
       <h2>Radar energy</h2>
-      <div class="mute">Moving <b id="movV">0</b></div><div class="bar"><i id="movB"></i></div>
-      <div class="mute">Stationary <b id="staV">0</b></div><div class="bar s"><i id="staB"></i></div>
+      <div class="mute">Moving <b id="movV">–</b></div><div class="bar"><i id="movB"></i></div>
+      <div class="mute">Stationary <b id="staV">–</b></div><div class="bar s"><i id="staB"></i></div>
     </section>
 
-    <section class="card c-time in" style="--i:5">
+    <section class="card c-time in" style="--i:5" id="cardTime">
       <h2>Timers</h2>
-      <svg width="0" height="0"><defs><linearGradient id="g"><stop offset="0" stop-color="#b6ffd8"/><stop offset="1" stop-color="#7fd4ff"/></linearGradient></defs></svg>
+      <svg width="0" height="0"><defs><linearGradient id="g"><stop offset="0" stop-color="#2ea8ff"/><stop offset="1" stop-color="#7dffb8"/></linearGradient></defs></svg>
       <div class="rings" id="rings"></div>
     </section>
 
-    <section class="card c-health in" style="--i:6">
+    <section class="card c-health in" style="--i:6" id="cardHealth">
       <h2>Device health</h2>
       <div class="grid2">
         <div class="mute">WiFi signal<b id="hRssi">–</b></div>
@@ -214,8 +267,8 @@ ul.tl li.new{animation:slide .7s cubic-bezier(.2,.8,.2,1)}
       </div>
     </section>
 
-    <section class="card c-log in" style="--i:7">
-      <h2>History</h2>
+    <section class="card c-log in" style="--i:7" id="cardLog">
+      <h2>History <span class="tag" id="logTag"></span></h2>
       <ul class="tl" id="log"><li class="mute">No events yet.</li></ul>
     </section>
   </main>
@@ -238,173 +291,514 @@ const BASE = "devices/unit1";
 const ALLOWED = ["jonymangozo25@gmail.com","jofelechavez143@gmail.com","nalingseanlouis@gmail.com","seanlouisnaling@gmail.com"];
 const $ = id => document.getElementById(id);
 
-let st = null, stAt = 0, pendingId = null, started = false, lastKey = null, lastBeat = 0;
-const seenLog = new Set(); let firstLog = true;
+const STALE_MS             = 12000;
+const OFFLINE_MS           = 40000;
+const NO_DATA_MS           = 20000;
+const FRESH_PROOF_MS       = 20000;
+const MIN_INIT_MS          = 2000;
+const PENDING_TIMEOUT_MS   = 20000;
+const STATE_MATCH_DELAY_MS = 1500;
 
-/* ---------- ui helpers ---------- */
+let st = null;
+let stRecvAt = 0;
+let confirmedAt = 0;
+let everLive = false;
+let phase = "INIT";
+let startedAt = 0;
+let pending = null;
+let ang = 300;
+let latestLog = [];
+const seenLog = new Set();
+
+let unsubStatus = null;
+let unsubLog = null;
+let tickInterval = null;
+
 document.addEventListener("pointermove", e => {
   const c = e.target.closest && e.target.closest(".card"); if (!c) return;
   const r = c.getBoundingClientRect();
-  c.style.setProperty("--mx", (e.clientX - r.left) + "px"); c.style.setProperty("--my", (e.clientY - r.top) + "px");
+  c.style.setProperty("--mx", (e.clientX - r.left) + "px");
+  c.style.setProperty("--my", (e.clientY - r.top) + "px");
 });
 document.addEventListener("click", e => {
   const b = e.target.closest("button"); if (!b || b.disabled) return;
   const r = b.getBoundingClientRect(), s = Math.max(r.width, r.height), d = document.createElement("span");
-  d.className = "rip"; d.style.cssText = `width:${s}px;height:${s}px;left:${e.clientX - r.left - s/2}px;top:${e.clientY - r.top - s/2}px`;
+  d.className = "rip";
+  d.style.cssText = `width:${s}px;height:${s}px;left:${e.clientX - r.left - s/2}px;top:${e.clientY - r.top - s/2}px`;
   b.append(d); setTimeout(() => d.remove(), 650);
 });
+
 function tween(el, to, suffix = "") {
-  const from = el._v ?? 0; el._v = to;
+  const from = el._v ?? to; el._v = to;
   if (from === to) { el.textContent = to + suffix; return; }
   const t0 = performance.now();
-  (function f(t) { const k = Math.min(1, (t - t0) / 700), e = 1 - Math.pow(1 - k, 3);
-    el.textContent = Math.round(from + (to - from) * e) + suffix; if (k < 1) requestAnimationFrame(f); })(t0);
+  (function f(t) {
+    const k = Math.min(1, (t - t0) / 700);
+    const e = 1 - Math.pow(1 - k, 3);
+    el.textContent = Math.round(from + (to - from) * e) + suffix;
+    if (k < 1) requestAnimationFrame(f);
+  })(t0);
 }
-function toast(msg, kind = "") {
-  const t = document.createElement("div"); t.className = "toast " + kind; t.textContent = msg;
-  $("toasts").append(t);
-  setTimeout(() => { t.classList.add("out"); setTimeout(() => t.remove(), 400); }, 4200);
+function setBtn(b, text) {
+  let textNode = null;
+  for (const n of b.childNodes) { if (n.nodeType === Node.TEXT_NODE) { textNode = n; break; } }
+  if (!textNode) { textNode = document.createTextNode(""); b.insertBefore(textNode, b.firstChild); }
+  if (textNode.textContent !== text) textNode.textContent = text;
 }
+function setPill(el, text, cls) { el.textContent = text; el.className = "pill " + cls; }
 
-/* ---------- auth ---------- */
-$("signin").onclick = () => signInWithPopup(auth, new GoogleAuthProvider()).catch(e => $("loginErr").textContent = e.message);
+function toast(msg, kind = "", duration = 4200, tag = "") {
+  const t = document.createElement("div");
+  t.className = "toast " + kind;
+  if (tag) t.dataset.tag = tag;
+  t.textContent = msg;
+  $("toasts").append(t);
+  setTimeout(() => { t.classList.add("out"); setTimeout(() => t.remove(), 400); }, duration);
+}
+function dismissToastTag(tag) {
+  document.querySelectorAll(`.toast[data-tag="${tag}"]`).forEach(t => {
+    t.classList.add("out");
+    setTimeout(() => t.remove(), 400);
+  });
+}
+const fmtUp = s => {
+  s = Math.floor(s);
+  const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
+  return (d ? d + "d " : "") + h + "h " + m + "m";
+};
+const left = k => st ? Math.max(0, (st[k] || 0) - Math.floor((Date.now() - stRecvAt) / 1000)) : 0;
+
+const TIMERS = [
+  ["cooldownLeftS", "Auto cooldown"],
+  ["absenceLeftS", "Absence delay"],
+  ["manualLimitLeftS", "Manual limit"],
+  ["manualTimeoutLeftS", "Manual timeout"]
+];
+const maxSeen = {};
+$("rings").innerHTML = TIMERS.map(([k, n]) =>
+  `<div class="tr"><svg viewBox="0 0 60 60"><circle class="bg" cx="30" cy="30" r="26"/><circle class="fg" id="f_${k}" cx="30" cy="30" r="26"/></svg><span class="v" id="v_${k}">–</span><span class="mute">${n}</span></div>`
+).join("");
+
+$("signin").onclick = () => signInWithPopup(auth, new GoogleAuthProvider())
+  .catch(e => $("loginErr").textContent = e.message);
 $("signout").onclick = () => signOut(auth);
+
 onAuthStateChanged(auth, u => {
   const ok = u && ALLOWED.includes((u.email || "").toLowerCase());
   $("login").classList.toggle("hidden", !!ok);
   $("app").classList.toggle("hidden", !ok);
-  if (u && !ok) { $("loginErr").textContent = u.email + " is not authorized. Sign in with an approved account."; signOut(auth); return; }
-  if (ok) { $("who").textContent = u.email; if (!started) { started = true; start(); } }
+  if (u && !ok) {
+    $("loginErr").textContent = u.email + " is not authorized. Sign in with an approved account.";
+    signOut(auth);
+    return;
+  }
+  if (ok) {
+    $("who").textContent = u.email;
+    startSession();
+  } else {
+    stopSession();
+  }
 });
 
-/* ---------- commands ---------- */
-function send(action) {
-  pendingId = Date.now();
-  set(ref(db, BASE + "/control"), { action, cmdId: pendingId })
-    .then(() => toast("Command sent. Waiting for the device…"))
-    .catch(e => { pendingId = null; toast("Could not send: " + e.message, "bad"); });
-}
-$("bAuto").onclick = () => send("auto");
-$("bOverride").onclick = () => send("override");
-$("bOn").onclick = () => send("on");
-$("bOff").onclick = () => send("off");
-
-function handleResult(lc) {
-  if (!lc || pendingId === null || lc.cmdId !== pendingId) return;
-  pendingId = null;
-  const m = {
-    1: ["Done. The device applied your command.", "ok"],
-    2: ["The relay is already in that state.", ""],
-    3: ["Too fast. Wait " + (lc.retryAfterS || 0) + " seconds before trying again.", "bad"],
-    4: ["Click Manual override before turning the relay on or off.", "bad"],
-    5: ["The device did not recognize that command.", "bad"]
-  }[lc.result] || ["Unknown result code " + lc.result, "bad"];
-  toast(m[0], m[1]);
+function stopSession() {
+  if (unsubStatus) { try { unsubStatus(); } catch (e) {} unsubStatus = null; }
+  if (unsubLog)    { try { unsubLog();    } catch (e) {} unsubLog    = null; }
+  if (tickInterval){ clearInterval(tickInterval); tickInterval = null; }
+  if (pending?.timer) { clearTimeout(pending.timer); pending = null; }
+  dismissToastTag("sending");
 }
 
-/* ---------- timers (rings) ---------- */
-const TIMERS = [["cooldownLeftS", "Auto cooldown"], ["absenceLeftS", "Absence delay"], ["manualLimitLeftS", "Manual limit"], ["manualTimeoutLeftS", "Manual timeout"]];
-const maxSeen = {};
-$("rings").innerHTML = TIMERS.map(([k, n]) => `<div class="tr"><svg viewBox="0 0 60 60"><circle class="bg" cx="30" cy="30" r="26"/><circle class="fg" id="f_${k}" cx="30" cy="30" r="26"/></svg><span class="v" id="v_${k}">0</span><span class="mute">${n}</span></div>`).join("");
+function startSession() {
+  stopSession();
 
-/* ---------- listeners ---------- */
-function start() {
-  onValue(ref(db, BASE + "/status"), s => {
-    const v = s.val(); if (!v) return;
-    st = v; stAt = Date.now();
+  st = null;
+  stRecvAt = 0;
+  confirmedAt = 0;
+  everLive = false;
+  startedAt = Date.now();
+  phase = "INIT";
+  latestLog = [];
+  seenLog.clear();
+  ang = 300;
+  pending = null;
+
+  unsubStatus = onValue(ref(db, BASE + "/status"), snap => {
+    const v = snap.val();
+    if (!v) return;
+    const now = Date.now();
+
+    let fresh = false;
+    if (typeof v.ts === "number" && Math.abs(now - v.ts) <= FRESH_PROOF_MS) fresh = true;
+    else if (st && typeof v.uptimeS === "number" && typeof st.uptimeS === "number" && v.uptimeS > st.uptimeS) fresh = true;
+    else if (st?.lastCmd && v.lastCmd && typeof v.lastCmd.seq === "number" && typeof st.lastCmd.seq === "number" && v.lastCmd.seq > st.lastCmd.seq) fresh = true;
+
+    st = v;
+    stRecvAt = now;
     for (const [k] of TIMERS) maxSeen[k] = Math.max(maxSeen[k] || 1, v[k] || 0);
-    const key = v.uptimeS + "|" + v.ts;
-    if (key !== lastKey) { lastKey = key; lastBeat = Date.now(); }
-    handleResult(v.lastCmd);
-    render(true);
+    if (fresh) { confirmedAt = now; everLive = true; }
+
+    ang += (Math.random() - .5) * 40;
+    checkPending();
+    render();
   }, e => toast("Status read failed: " + e.message, "bad"));
 
-  onValue(query(ref(db, BASE + "/log"), limitToLast(40)), s => {
+  unsubLog = onValue(query(ref(db, BASE + "/log"), limitToLast(40)), snap => {
     const items = [];
-    s.forEach(c => { items.push({ k: c.key, ...c.val() }); });
-    renderLog(items.reverse());
+    snap.forEach(c => {
+      const val = c.val();
+      if (val && typeof val === "object") items.push({ ...val, k: c.key });
+      else items.push({ k: c.key, changed: String(val ?? "") });
+    });
+    items.sort((a, b) => {
+      const ta = typeof a.ts === "number" ? a.ts : 0;
+      const tb = typeof b.ts === "number" ? b.ts : 0;
+      if (ta !== tb) return tb - ta;
+      return a.k < b.k ? 1 : (a.k > b.k ? -1 : 0);
+    });
+    latestLog = items;
+    paintLog();
   }, () => {});
-  setInterval(() => render(false), 1000);
+
+  tickInterval = setInterval(render, 1000);
+  render();
 }
 
-/* ---------- render ---------- */
-const left = k => st ? Math.max(0, (st[k] || 0) - Math.floor((Date.now() - stAt) / 1000)) : 0;
-const fmtUp = s => { s = Math.floor(s); const d = Math.floor(s/86400), h = Math.floor(s%86400/3600), m = Math.floor(s%3600/60); return (d?d+"d ":"") + h + "h " + m + "m"; };
-let ang = 300;
+function send(action) {
+  if (pending) { toast("Please wait for the previous command to finish.", ""); return; }
+  if (phase !== "LIVE" || !st) { toast("The system is not online right now.", "bad"); return; }
 
-function render(fresh) {
-  const online = st && (Date.now() - lastBeat) < 15000;
-  $("hbDot").classList.toggle("on", !!online);
-  $("hbText").textContent = !st ? "Connecting…" : online ? "System online" : "Device offline";
-  if (!st) return;
+  if ((action === "on" || action === "off") && !st.manual) {
+    toast("Click Manual override before turning the relay on or off.", "bad"); return;
+  }
+  if (action === "on"  &&  st.relayOn) { toast("Relay is already ON — nothing to change.", ""); return; }
+  if (action === "off" && !st.relayOn) { toast("Relay is already OFF — nothing to change.", ""); return; }
+  if ((action === "on" || action === "off") && left("manualLimitLeftS") > 0) {
+    toast("Wait " + left("manualLimitLeftS") + "s before trying again.", "bad"); return;
+  }
+  if (action === "auto"     && !st.manual) { toast("Already in Auto mode.", ""); return; }
+  if (action === "override" &&  st.manual) { toast("Already in Manual override.", ""); return; }
+  if (action === "auto" && !st.radarConnected) {
+    toast("Radar is disconnected, so Auto mode is unavailable.", "bad"); return;
+  }
 
-  const orb = $("orb");
-  orb.classList.toggle("off", !online);
-  orb.classList.toggle("hot", !!st.presence);
-  $("presTxt").textContent = st.presence ? "Someone’s here" : "Room empty";
-  $("presTxt").classList.toggle("hot", !!st.presence);
-  $("relayLine").textContent = "Appliance power is " + (st.relayOn ? "on" : "off") + (st.manual ? ", controlled by you." : ", controlled automatically.");
-  $("distTxt").innerHTML = st.presence ? "Target at " + st.detDist + " cm" : "&nbsp;";
-  if (fresh) { ang += (Math.random() - .5) * 40; }
-  const rr = Math.min(1, (st.detDist || 0) / 600) * 0.44 + 0.04, rad = ang * Math.PI / 180;
-  $("blip").style.left = (50 + Math.cos(rad) * rr * 100) + "%";
-  $("blip").style.top = (50 + Math.sin(rad) * rr * 100) + "%";
+  const id = Date.now();
+  pending = {
+    id,
+    action,
+    since: Date.now(),
+    stateAtSend: { relayOn: !!st.relayOn, manual: !!st.manual }
+  };
 
-  const mp = $("modePill"); mp.textContent = st.manual ? "Manual override" : "Auto mode"; mp.className = "pill " + (st.manual ? "warn" : "ok");
-  const op = $("outPill"); op.textContent = "OUT pin " + (st.outHigh ? "high" : "low"); op.className = "pill " + (st.outHigh ? "ok" : "");
-  const rp = $("radarPill"); rp.textContent = st.radarConnected ? "Radar linked" : "Radar lost"; rp.className = "pill " + (st.radarConnected ? "ok" : "bad");
+  toast("Command sent. Waiting for the device…", "", 3000, "sending");
 
-  const wasHidden = $("radarWarn").classList.contains("hidden");
-  $("radarWarn").classList.toggle("hidden", !!st.radarConnected);
-  if (!st.radarConnected && wasHidden) { $("radarWarn").style.animation = "none"; void $("radarWarn").offsetWidth; $("radarWarn").style.animation = ""; }
-  $("bulb").classList.toggle("on", !!st.relayOn);
-  $("relayTxt").textContent = st.relayOn ? "Power ON" : "Power OFF";
-  $("modeHint").textContent = st.manual ? "Back to Auto in " + left("manualTimeoutLeftS") + "s" : "Click Manual override to take control";
+  set(ref(db, BASE + "/control"), { action, cmdId: id })
+    .catch(e => {
+      if (!pending || pending.id !== id) return;
+      clearTimeout(pending.timer);
+      pending = null;
+      dismissToastTag("sending");
+      toast("Could not send: " + e.message, "bad");
+      render();
+    });
+
+  pending.timer = setTimeout(() => onPendingTimeout(id), PENDING_TIMEOUT_MS);
+  render();
+}
+$("bAuto").onclick     = () => send("auto");
+$("bOverride").onclick = () => send("override");
+$("bOn").onclick       = () => send("on");
+$("bOff").onclick      = () => send("off");
+
+function stateMatches() {
+  if (!pending || !st) return false;
+  const b = pending.stateAtSend;
+  if (pending.action === "on"       &&  st.relayOn && !b.relayOn) return true;
+  if (pending.action === "off"      && !st.relayOn &&  b.relayOn) return true;
+  if (pending.action === "override" &&  st.manual  && !b.manual ) return true;
+  if (pending.action === "auto"     && !st.manual  &&  b.manual ) return true;
+  return false;
+}
+
+function checkPending() {
+  if (!pending) return;
+  const lc = st?.lastCmd;
+  const action = pending.action;
+
+  if (lc && lc.cmdId !== undefined && String(lc.cmdId) === String(pending.id)) {
+    resolvePending(lc.result, lc.retryAfterS);
+    return;
+  }
+
+  if (Date.now() - pending.since > STATE_MATCH_DELAY_MS && stateMatches()) {
+    resolvePending(1);
+  }
+}
+
+function resolvePending(result, retryAfterS) {
+  if (!pending) return;
+  const action = pending.action;
+  if (pending.timer) clearTimeout(pending.timer);
+  pending = null;
+  dismissToastTag("sending");
+
+  let msg, kind;
+  switch (result) {
+    case 1: msg = "Command applied."; kind = "ok"; break;
+    case 2:
+      if (action === "on") msg = "Relay is already ON.";
+      else if (action === "off") msg = "Relay is already OFF.";
+      else if (action === "auto") msg = "Already in Auto mode.";
+      else if (action === "override") msg = "Already in Manual override.";
+      else msg = "No change needed.";
+      kind = ""; break;
+    case 3: msg = "Too fast. Wait " + (retryAfterS || 0) + "s before trying again."; kind = "bad"; break;
+    case 4: msg = "Switch to Manual override before turning the relay on or off."; kind = "bad"; break;
+    case 5: msg = "The device did not recognize that command."; kind = "bad"; break;
+    default: msg = "Unknown result code " + result; kind = "bad";
+  }
+  toast(msg, kind);
+  render();
+}
+
+function onPendingTimeout(id) {
+  if (!pending || pending.id !== id) return;
+  const action = pending.action;
+  const matched = stateMatches();
+  pending = null;
+  dismissToastTag("sending");
+
+  if (matched) {
+    let msg = "Command applied.";
+    if (action === "auto") msg = "Switched to Auto mode.";
+    else if (action === "override") msg = "Switched to Manual override.";
+    else if (action === "on") msg = "Relay turned ON.";
+    else if (action === "off") msg = "Relay turned OFF.";
+    toast(msg, "ok");
+  } else if (phase === "LIVE") {
+    toast("No response from the device. Try again.", "bad");
+  } else {
+    toast("Connection lost — could not confirm the command.", "bad");
+  }
+  render();
+}
+
+function computePhase(now) {
+  if (!startedAt || now - startedAt < MIN_INIT_MS) return "INIT";
+  if (!st) return (now - startedAt > NO_DATA_MS) ? "OFFLINE" : "INIT";
+  if (!everLive) return (now - stRecvAt > OFFLINE_MS) ? "OFFLINE" : "INIT";
+  const age = now - confirmedAt;
+  if (age <= STALE_MS) return "LIVE";
+  if (age <= OFFLINE_MS) return "WAITING";
+  return "OFFLINE";
+}
+
+function renderHeader() {
+  const map = {
+    INIT:    ["init", "Initializing…"],
+    LIVE:    ["live", "System online"],
+    WAITING: ["wait", "Reconnecting…"],
+    OFFLINE: ["off",  "Device offline"]
+  };
+  const [cls, txt] = map[phase];
+  $("hbDot").className = "dot " + cls;
+  $("hbText").textContent = txt;
+}
+
+function updateControls() {
+  if (pending) {
+    for (const id of ["bAuto", "bOverride", "bOn", "bOff"]) $(id).disabled = true;
+    setBtn($("bAuto"), "Auto mode");
+    setBtn($("bOverride"), "Manual override");
+    setBtn($("bOn"), "Turn ON");
+    setBtn($("bOff"), "Turn OFF");
+    const btn = { on: $("bOn"), off: $("bOff"), override: $("bOverride"), auto: $("bAuto") }[pending.action];
+    if (btn) setBtn(btn, "Sending…");
+    return;
+  }
+
+  if (phase !== "LIVE" || !st) {
+    for (const id of ["bAuto", "bOverride", "bOn", "bOff"]) $(id).disabled = true;
+    setBtn($("bAuto"), "Auto mode");
+    setBtn($("bOverride"), "Manual override");
+    setBtn($("bOn"), "Turn ON");
+    setBtn($("bOff"), "Turn OFF");
+    return;
+  }
 
   const lim = left("manualLimitLeftS");
-  $("bAuto").disabled = !online || !st.manual || !st.radarConnected;
-  $("bOverride").disabled = !online || st.manual;
-  for (const [id, label] of [["bOn", "Turn ON"], ["bOff", "Turn OFF"]]) {
-    const b = $(id); b.disabled = !online || !st.manual || lim > 0;
-    const txt = lim > 0 ? "Wait " + lim + "s…" : label; if (b.firstChild?.textContent !== txt) b.textContent = txt;
+  $("bAuto").disabled     = !st.manual || !st.radarConnected;
+  $("bOverride").disabled = st.manual;
+  $("bOn").disabled       = !st.manual || lim > 0;
+  $("bOff").disabled      = !st.manual || lim > 0;
+  setBtn($("bAuto"), "Auto mode");
+  setBtn($("bOverride"), "Manual override");
+  setBtn($("bOn"),  lim > 0 ? "Wait " + lim + "s…" : "Turn ON");
+  setBtn($("bOff"), lim > 0 ? "Wait " + lim + "s…" : "Turn OFF");
+}
+
+function renderLive(now) {
+  const live    = phase === "LIVE";
+  const waiting = phase === "WAITING";
+  const haveData = !!st && (live || waiting);
+
+  for (const id of ["cardCtrl", "cardPres", "cardTime", "cardHealth"]) {
+    $(id).classList.toggle("stale", waiting);
+  }
+  $("hero").classList.toggle("stale", waiting);
+
+  const orb = $("orb");
+  orb.classList.toggle("off", !live);
+  orb.classList.toggle("hot", live && !!st && !!st.presence);
+
+  if (!haveData) {
+    const msg = phase === "OFFLINE" ? "Offline" : "Initializing…";
+    $("presTxt").textContent = msg;
+    $("presTxt").classList.add("init");
+    $("presTxt").classList.remove("hot");
+    $("relayLine").textContent = phase === "OFFLINE"
+      ? "Waiting for the device to come back."
+      : "Waiting for the device to check in.";
+    $("distTxt").innerHTML = "&nbsp;";
+    $("blip").style.opacity = "0";
+    setPill($("modePill"), "–", "idle");
+    setPill($("outPill"), "–", "idle");
+    setPill($("radarPill"), "–", "idle");
+    $("radarWarn").classList.add("hidden");
+    $("bulb").classList.remove("on");
+    $("relayTxt").textContent = msg;
+    $("modeHint").textContent = phase === "OFFLINE" ? "Controls are disabled while offline." : "";
+    $("movV").textContent = "–"; $("movB").style.width = "0%";
+    $("staV").textContent = "–"; $("staB").style.width = "0%";
+    for (const [k] of TIMERS) {
+      $("v_" + k).textContent = "–";
+      $("f_" + k).style.strokeDashoffset = "163.4";
+    }
+    $("hRssi").textContent = "–"; $("hUp").textContent = "–";
+    $("hDrops").textContent = "–"; $("hRadar").textContent = "–";
+    updateControls();
+    return;
   }
 
-  if (fresh) {
-    tween($("movV"), st.moving || 0); tween($("staV"), st.stationary || 0);
-    $("movB").style.width = Math.min(100, st.moving) + "%"; $("staB").style.width = Math.min(100, st.stationary) + "%";
-    tween($("hRssi"), st.rssi, " dBm"); tween($("hDrops"), st.drops);
+  const present = !!st.presence;
+  $("presTxt").classList.remove("init");
+  $("presTxt").textContent = present ? "Someone’s here" : "Room empty";
+  $("presTxt").classList.toggle("hot", present && live);
+  $("relayLine").textContent = "Appliance power is " + (st.relayOn ? "on" : "off")
+    + (st.manual ? ", controlled by you." : ", controlled automatically.");
+  $("distTxt").innerHTML = present ? "Target at " + st.detDist + " cm" : "&nbsp;";
+  $("blip").style.opacity = (present && live) ? "1" : "0";
+  if (present) {
+    const rr = Math.min(1, (st.detDist || 0) / 600) * 0.44 + 0.04;
+    const rad = ang * Math.PI / 180;
+    $("blip").style.left = (50 + Math.cos(rad) * rr * 100) + "%";
+    $("blip").style.top  = (50 + Math.sin(rad) * rr * 100) + "%";
   }
+
+  setPill($("modePill"), st.manual ? "Manual override" : "Auto mode", st.manual ? "warn" : "ok");
+  setPill($("outPill"),  "OUT pin " + (st.outHigh ? "high" : "low"), st.outHigh ? "ok" : "");
+  setPill($("radarPill"), st.radarConnected ? "Radar linked" : "Radar lost", st.radarConnected ? "ok" : "bad");
+
+  $("radarWarn").classList.toggle("hidden", !(live && !st.radarConnected));
+  $("bulb").classList.toggle("on", !!st.relayOn);
+  $("relayTxt").textContent = st.relayOn ? "Power ON" : "Power OFF";
+  $("modeHint").textContent = st.manual
+    ? "Back to Auto in " + left("manualTimeoutLeftS") + "s"
+    : "Click Manual override to take control";
+
+  tween($("movV"), st.moving || 0);
+  tween($("staV"), st.stationary || 0);
+  $("movB").style.width = Math.min(100, st.moving || 0) + "%";
+  $("staB").style.width = Math.min(100, st.stationary || 0) + "%";
+
   for (const [k] of TIMERS) {
-    const v = (k === "manualTimeoutLeftS" && !st.manual) ? 0 : left(k);
+    let v = left(k);
+    if (k === "manualTimeoutLeftS" && !st.manual) v = 0;
     $("v_" + k).textContent = v;
     $("f_" + k).style.strokeDashoffset = 163.4 * (1 - Math.min(1, v / maxSeen[k]));
   }
-  $("hUp").textContent = fmtUp(st.uptimeS + Math.floor((Date.now() - stAt) / 1000));
+
+  $("hRssi").textContent  = (st.rssi ?? 0) + " dBm";
+  $("hUp").textContent    = fmtUp(st.uptimeS + Math.floor((Date.now() - stRecvAt) / 1000));
+  $("hDrops").textContent = st.drops ?? 0;
   $("hRadar").textContent = st.radarConnected ? "Connected" : "Disconnected";
+
+  updateControls();
+}
+
+function render() {
+  const now = Date.now();
+  const prev = phase;
+  phase = computePhase(now);
+  renderHeader();
+  renderLive(now);
+  if (phase !== prev) {
+    paintLog();
+    const hero = $("hero");
+    hero.classList.remove("transition-flash");
+    void hero.offsetWidth;
+    hero.classList.add("transition-flash");
+  }
 }
 
 function describe(e) {
-  const parts = [], ch = (e.changed || "").split(",");
+  const parts = [];
+  const changedStr = typeof e.changed === "string" ? e.changed : String(e.changed ?? "");
+  const ch = changedStr.split(",");
   if (ch.includes("relay")) parts.push(e.relayOn ? "Relay turned ON" : "Relay turned OFF");
   if (ch.includes("mode")) parts.push(e.manual ? "Switched to Manual override" : "Switched to Auto mode");
   if (ch.includes("presence")) parts.push(e.presence ? "Person detected" : "Room became empty");
   if (e.cmdResult && e.cmdResult > 2) parts.push("Command rejected (code " + e.cmdResult + ")");
-  return parts.length ? parts.join(" · ") : (e.changed || "Event");
+  return parts.length ? parts.join(" · ") : (changedStr || "Event");
 }
-function renderLog(items) {
-  const ul = $("log"); ul.innerHTML = "";
-  if (!items.length) { ul.innerHTML = '<li class="mute">No events yet.</li>'; return; }
-  items.forEach((e, i) => {
+
+function paintLog() {
+  const ul = $("log"), tag = $("logTag");
+
+  if (phase === "OFFLINE") {
+    tag.textContent = "offline";
     const li = document.createElement("li");
-    const isNew = !seenLog.has(e.k); seenLog.add(e.k);
-    li.className = (e.cmdResult > 2 ? "bad" : (e.changed || "").includes("relay") ? "ok" : "") + (isNew ? " new" : "");
-    if (firstLog && isNew) li.style.animationDelay = Math.min(i, 12) * 60 + "ms";
-    const when = typeof e.ts === "number" && e.ts > 1e12 ? new Date(e.ts).toLocaleString() : "uptime " + fmtUp(e.uptimeS || 0);
-    li.innerHTML = "<div></div><div class='mute'></div>";
-    li.children[0].textContent = describe(e); li.children[1].textContent = when;
-    ul.append(li);
-  });
-  firstLog = false;
+    li.className = "mute";
+    li.textContent = "History is hidden while the device is offline.";
+    ul.replaceChildren(li);
+    return;
+  }
+  tag.textContent = phase === "WAITING" ? "stale" : "";
+
+  const frag = document.createDocumentFragment();
+
+  if (!Array.isArray(latestLog) || latestLog.length === 0) {
+    const li = document.createElement("li");
+    li.className = "mute";
+    li.textContent = "No events yet.";
+    frag.append(li);
+  } else {
+    latestLog.forEach((e, i) => {
+      try {
+        const li = document.createElement("li");
+        const isNew = !seenLog.has(e.k);
+        seenLog.add(e.k);
+        const cls = [];
+        if (e.cmdResult > 2) cls.push("bad");
+        else if ((e.changed || "").includes("relay")) cls.push("ok");
+        if (isNew) cls.push("new");
+        li.className = cls.join(" ");
+        if (isNew) li.style.animationDelay = Math.min(i, 12) * 60 + "ms";
+        const when = typeof e.ts === "number" && e.ts > 1e12
+          ? new Date(e.ts).toLocaleString()
+          : "uptime " + fmtUp(e.uptimeS || 0);
+        const d1 = document.createElement("div");
+        const d2 = document.createElement("div");
+        d2.className = "mute";
+        d1.textContent = describe(e);
+        d2.textContent = when;
+        li.append(d1, d2);
+        frag.append(li);
+      } catch (err) {
+        console.warn("Log render error", e, err);
+      }
+    });
+  }
+  ul.replaceChildren(frag);
 }
 </script>
 </body>
