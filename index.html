@@ -78,6 +78,10 @@ h1,h2,h3,.disp{font-family:"Big Shoulders Display",Impact,"Arial Narrow",sans-se
 header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem;gap:1rem;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:.7rem}
 .brand h1{font-size:1.7rem}
+.brand-logo{height:2.2rem;width:auto;object-fit:contain;filter:drop-shadow(0 0 10px rgba(46,168,255,.3))}
+.brand .dot{margin-left:.2rem}
+.header-right{display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap}
+
 .dot{width:12px;height:12px;border-radius:50%;background:#3a4a55;position:relative;transition:background .5s}
 .dot.init{background:var(--ice);animation:spinPulse 1.4s ease-in-out infinite}
 .dot.live{background:var(--green)}
@@ -173,6 +177,7 @@ ul.tl li.new{animation:slide .7s cubic-bezier(.2,.8,.2,1)}
 
 #login{min-height:88vh;display:grid;place-items:center;text-align:center;padding:1.5rem}
 #login h1{font-size:clamp(3.5rem,14vw,8rem);background:linear-gradient(100deg,#fff,#bfe9ff 40%,var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
+#login .logo{display:block;width:clamp(180px,34.5vw,390px);height:auto;margin:0 auto 1.2rem;filter:drop-shadow(0 0 40px rgba(46,168,255,.5)) drop-shadow(0 0 10px rgba(159,233,255,.4))}
 #login p{max-width:420px;margin:1rem auto 1.6rem;color:var(--mute)}
 #loginErr{color:var(--bad)!important;min-height:1.5em}
 
@@ -199,6 +204,7 @@ ul.tl li.new{animation:slide .7s cubic-bezier(.2,.8,.2,1)}
 
 <div id="login">
   <div>
+    <img src="logo.png" alt="PhantomGuard logo" class="logo in" style="--i:0">
     <h1 class="in">PhantomGuard</h1>
     <p class="in" style="--i:2">Sign in with an authorized Google account to watch the room and control the relay.</p>
     <button class="primary in" style="--i:3" id="signin">Sign in with Google</button>
@@ -208,8 +214,15 @@ ul.tl li.new{animation:slide .7s cubic-bezier(.2,.8,.2,1)}
 
 <div id="app" class="hidden">
   <header class="in">
-    <div class="brand"><span class="dot init" id="hbDot"></span><h1>PhantomGuard</h1><span class="mute" id="hbText">Initializing…</span></div>
-    <div><span class="mute" id="who"></span> <button id="signout">Sign out</button></div>
+    <div class="brand">
+      <img src="logo.png" alt="PhantomGuard logo" class="brand-logo">
+      <h1>PhantomGuard</h1>
+      <span class="dot init" id="hbDot"></span>
+    </div>
+    <div class="header-right">
+      <span class="mute" id="who"></span> 
+      <button id="signout">Sign out</button>
+    </div>
   </header>
 
   <main>
@@ -595,14 +608,12 @@ function computePhase(now) {
 
 function renderHeader() {
   const map = {
-    INIT:    ["init", "Initializing…"],
-    LIVE:    ["live", "System online"],
-    WAITING: ["wait", "Reconnecting…"],
-    OFFLINE: ["off",  "Device offline"]
+    INIT:    "init",
+    LIVE:    "live",
+    WAITING: "wait",
+    OFFLINE: "off"
   };
-  const [cls, txt] = map[phase];
-  $("hbDot").className = "dot " + cls;
-  $("hbText").textContent = txt;
+  $("hbDot").className = "dot " + map[phase];
 }
 
 function updateControls() {
@@ -682,8 +693,14 @@ function renderLive(now) {
 
   const present = !!st.presence;
   $("presTxt").classList.remove("init");
-  $("presTxt").textContent = present ? "Someone’s here" : "Room empty";
-  $("presTxt").classList.toggle("hot", present && live);
+  if (waiting) {
+    $("presTxt").textContent = "Reconnecting…";
+    $("presTxt").classList.remove("hot");
+  } else {
+    $("presTxt").textContent = present ? "Someone’s here" : "Room empty";
+    $("presTxt").classList.toggle("hot", present && live);
+  }
+  
   $("relayLine").textContent = "Appliance power is " + (st.relayOn ? "on" : "off")
     + (st.manual ? ", controlled by you." : ", controlled automatically.");
   $("distTxt").innerHTML = present ? "Target at " + st.detDist + " cm" : "&nbsp;";
