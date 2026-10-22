@@ -772,11 +772,13 @@ function describe(e) {
 function paintLog() {
   const ul = $("log"), tag = $("logTag");
 
-  if (phase === "OFFLINE") {
-    tag.textContent = "offline";
+  if (phase === "OFFLINE" || phase === "INIT") {
+    tag.textContent = phase === "OFFLINE" ? "offline" : "init";
     const li = document.createElement("li");
     li.className = "mute";
-    li.textContent = "History is hidden while the device is offline.";
+    li.textContent = phase === "OFFLINE" 
+      ? "History is hidden while the device is offline." 
+      : "History is hidden while initializing.";
     ul.replaceChildren(li);
     return;
   }
