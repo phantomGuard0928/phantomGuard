@@ -252,6 +252,7 @@ ul.tl li.new{animation:slide .7s cubic-bezier(.2,.8,.2,1)}
 
 @media (max-width:600px) {
   #who { display: none; }
+  #freshChip { display: none; }
 }
 
 @media (prefers-reduced-motion:reduce){
@@ -552,7 +553,7 @@ function startSession() {
     render();
   }, e => toast("Status read failed: " + e.message, "bad"));
 
-  unsubLog = onValue(query(ref(db, BASE + "/log"), limitToLast(15)), snap => {
+  unsubLog = onValue(query(ref(db, BASE + "/log"), limitToLast(10)), snap => {
     const items = [];
     snap.forEach(c => {
       const val = c.val();
