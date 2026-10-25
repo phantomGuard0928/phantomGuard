@@ -22,42 +22,27 @@ html{scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Manrope,"Segoe UI",system-ui,sans-serif;overflow-x:hidden;min-height:100vh}
 h1,h2,h3,.disp{font-family:"Big Shoulders Display",Impact,"Arial Narrow",sans-serif;font-weight:900;text-transform:uppercase;letter-spacing:.01em;line-height:.95;margin:0}
 .hidden{display:none!important}
-.mute{color:var(--mute);font-size:.85rem}
+.mute{color:var(--mute);font-size:.875rem}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 
 /* ------- background glows ------- */
 .aurora{position:fixed;inset:0;z-index:-2;overflow:hidden}
-.aurora i{position:absolute;border-radius:50%;filter:blur(100px);opacity:.5;animation:drift 22s ease-in-out infinite alternate}
+.aurora i{position:absolute;border-radius:50%;filter:blur(80px);opacity:.45;animation:drift 22s ease-in-out infinite alternate}
 .aurora i:nth-child(1){width:55vw;height:55vw;background:#0b3a8a;left:-10vw;top:-15vw}
 .aurora i:nth-child(2){width:45vw;height:45vw;background:#0a6b7a;right:-12vw;top:8vh;animation-duration:28s;animation-delay:-6s}
 .aurora i:nth-child(3){width:50vw;height:50vw;background:#134a5c;left:25vw;bottom:-25vw;animation-duration:24s;animation-delay:-11s}
 @keyframes drift{to{transform:translate(7vw,5vh) scale(1.18)}}
 
-/* ------- rising spectral fog (visibly moves up and down) ------- */
+/* ------- rising spectral fog ------- */
 .fog{
   position:fixed;inset:auto 0 0 0;height:70vh;z-index:-1;pointer-events:none;overflow:hidden;
   -webkit-mask-image:linear-gradient(to top,transparent 0%,#000 10%,#000 60%,rgba(0,0,0,.55) 82%,transparent 100%);
           mask-image:linear-gradient(to top,transparent 0%,#000 10%,#000 60%,rgba(0,0,0,.55) 82%,transparent 100%);
 }
-.fog i{
-  position:absolute;left:-15%;right:-15%;bottom:-22%;height:135%;
-  filter:blur(42px);will-change:transform,opacity;pointer-events:none;
-}
-.fog .f1{
-  background:
-    radial-gradient(58% 62% at 32% 100%,rgba(159,233,255,.24),transparent 68%),
-    radial-gradient(46% 52% at 78% 100%,rgba(46,168,255,.16),transparent 70%);
-  animation:fogRise 17s ease-in-out infinite;
-}
-.fog .f2{
-  background:
-    radial-gradient(52% 56% at 68% 100%,rgba(125,255,184,.18),transparent 70%),
-    radial-gradient(42% 48% at 22% 100%,rgba(159,233,255,.11),transparent 72%);
-  animation:fogRise 23s ease-in-out infinite;animation-delay:-7s;
-}
-.fog .f3{
-  background:radial-gradient(70% 78% at 50% 100%,rgba(220,245,255,.10),transparent 72%);
-  animation:fogRise 29s ease-in-out infinite;animation-delay:-13s;
-}
+.fog i{position:absolute;left:-15%;right:-15%;bottom:-22%;height:135%;filter:blur(32px);will-change:transform,opacity;pointer-events:none}
+.fog .f1{background:radial-gradient(58% 62% at 32% 100%,rgba(159,233,255,.24),transparent 68%),radial-gradient(46% 52% at 78% 100%,rgba(46,168,255,.16),transparent 70%);animation:fogRise 17s ease-in-out infinite}
+.fog .f2{background:radial-gradient(52% 56% at 68% 100%,rgba(125,255,184,.18),transparent 70%),radial-gradient(42% 48% at 22% 100%,rgba(159,233,255,.11),transparent 72%);animation:fogRise 23s ease-in-out infinite;animation-delay:-7s}
+.fog .f3{background:radial-gradient(70% 78% at 50% 100%,rgba(220,245,255,.10),transparent 72%);animation:fogRise 29s ease-in-out infinite;animation-delay:-13s}
 @keyframes fogRise{
   0%  {transform:translate3d(-3%,10%,0) scale(1);   opacity:.72}
   50% {transform:translate3d( 3%,-9%,0) scale(1.09);opacity:1}
@@ -71,16 +56,21 @@ h1,h2,h3,.disp{font-family:"Big Shoulders Display",Impact,"Arial Narrow",sans-se
 .card:hover{transform:translateY(-3px)}
 .card:hover::before{opacity:1}
 .card:hover::after{opacity:1}
-.card.stale{opacity:.45;filter:saturate(.55)}
+.card.stale{opacity:.55;filter:saturate(.7)}
 .card h2{font-size:1.5rem;margin-bottom:1rem;display:flex;align-items:center;gap:.6rem}
-.card h2 .tag{font:800 .62rem Manrope,sans-serif;letter-spacing:.12em;color:var(--mute);border:1px solid rgba(120,190,230,.25);padding:.15rem .5rem;border-radius:99px;text-transform:uppercase}
 
 header{display:flex;justify-content:space-between;align-items:center;padding:1rem 1.5rem;gap:1rem;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:.7rem}
 .brand h1{font-size:1.7rem}
 .brand-logo{height:2.2rem;width:auto;object-fit:contain;filter:drop-shadow(0 0 10px rgba(46,168,255,.3))}
 .brand .dot{margin-left:.2rem}
-.header-right{display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap}
+.header-right{display:flex;align-items:center;gap:1rem;flex-wrap:wrap}
+
+.fresh-chip{font:700 .72rem Manrope,sans-serif;padding:.25rem .7rem;border-radius:99px;border:1px solid rgba(120,190,230,.3);color:var(--mute);letter-spacing:.02em;transition:color .4s,border-color .4s}
+.fresh-chip.live{color:var(--green);border-color:rgba(125,255,184,.5)}
+.fresh-chip.wait{color:var(--warn);border-color:rgba(255,193,77,.5)}
+.fresh-chip.off{color:var(--bad);border-color:rgba(255,107,122,.5)}
+.fresh-chip.init{color:var(--ice);border-color:rgba(159,233,255,.3)}
 
 .dot{width:12px;height:12px;border-radius:50%;background:#3a4a55;position:relative;transition:background .5s}
 .dot.init{background:var(--ice);animation:spinPulse 1.4s ease-in-out infinite}
@@ -92,7 +82,7 @@ header{display:flex;justify-content:space-between;align-items:center;padding:1re
 @keyframes blink{50%{opacity:.25}}
 @keyframes spinPulse{50%{box-shadow:0 0 14px var(--ice);transform:scale(1.2)}}
 
-button{font:700 .9rem Manrope,sans-serif;cursor:pointer;color:var(--ink);background:rgba(255,255,255,.05);border:1px solid rgba(120,190,230,.3);padding:.7rem 1.2rem;border-radius:999px;position:relative;overflow:hidden;transition:transform .15s,border-color .25s,box-shadow .25s,background .25s,opacity .3s}
+button{font:700 .9rem Manrope,sans-serif;cursor:pointer;color:var(--ink);background:rgba(255,255,255,.05);border:1px solid rgba(120,190,230,.3);padding:.7rem 1.2rem;border-radius:999px;position:relative;overflow:hidden;transition:transform .15s,border-color .25s,box-shadow .25s,background .25s,opacity .3s,color .25s}
 button:hover:not(:disabled){border-color:var(--ice);box-shadow:0 0 22px rgba(46,168,255,.4)}
 button:active:not(:disabled){transform:scale(.95)}
 button:focus-visible{outline:2px solid var(--ice);outline-offset:3px}
@@ -100,24 +90,40 @@ button:disabled{opacity:.32;cursor:not-allowed}
 button.primary{background:linear-gradient(120deg,var(--blue-deep),var(--blue));border-color:transparent;color:#fff}
 button.primary:hover:not(:disabled){box-shadow:0 0 26px rgba(46,168,255,.6)}
 button.danger:hover:not(:disabled){border-color:var(--bad);box-shadow:0 0 22px rgba(255,107,122,.4)}
+
+/* Strip backgrounds when disabled */
+button.primary:disabled, 
+button.danger:disabled {
+  background: rgba(255,255,255,.05);
+  border-color: rgba(120,190,230,.3);
+  color: var(--ink);
+  box-shadow: none;
+}
+
 .rip{position:absolute;border-radius:50%;background:rgba(255,255,255,.4);transform:scale(0);animation:rip .6s ease-out forwards;pointer-events:none}
 @keyframes rip{to{transform:scale(4);opacity:0}}
 
 main{max-width:1120px;margin:0 auto;padding:0 1.5rem 3rem;display:grid;gap:1.25rem;grid-template-columns:repeat(12,1fr)}
 .hero{grid-column:1/-1;display:grid;grid-template-columns:minmax(260px,380px) 1fr;gap:2rem;align-items:center;padding:1rem 0 1.5rem;transition:opacity .5s}
-.hero.stale{opacity:.45}
+.hero.stale{opacity:.55}
 .hero.transition-flash{animation:flash .6s ease-out}
-@keyframes flash{0%,100%{filter:none}50%{filter:brightness(1.35)}}
-.state{font-size:clamp(2.8rem,8vw,5.6rem);transition:color .5s}
+@keyframes flash{0%,100%{filter:none}50%{filter:brightness(1.2)}}
+.state{font-size:clamp(2.2rem,5.5vw,3.6rem);transition:color .5s}
 .state.hot{color:var(--green);text-shadow:0 0 46px rgba(125,255,184,.55)}
 .state.init{color:var(--mute)}
-.sub{margin:.8rem 0 1rem;font-size:1.1rem;color:var(--mute)}
+.sub{margin:.8rem 0 1rem;font-size:1rem;color:var(--mute)}
 .pills{display:flex;gap:.6rem;flex-wrap:wrap}
 .pill{padding:.25rem .85rem;border-radius:999px;font-size:.8rem;font-weight:800;border:1px solid rgba(120,190,230,.35);transition:all .4s}
 .pill.ok{color:var(--green);border-color:var(--green);box-shadow:0 0 14px rgba(125,255,184,.3)}
 .pill.warn{color:var(--warn);border-color:var(--warn);box-shadow:0 0 14px rgba(255,193,77,.3)}
 .pill.bad{color:var(--bad);border-color:var(--bad)}
 .pill.idle{color:var(--mute)}
+
+/* hero radar bars */
+.hero-bars{display:grid;gap:.5rem;margin:0 0 1rem;max-width:360px}
+.hb-row{display:grid;grid-template-columns:5.5rem 2.5rem 1fr;gap:.6rem;align-items:center;font-size:.8rem;color:var(--mute)}
+.hb-row b{font:800 .85rem Manrope,sans-serif;color:var(--ink);text-align:right}
+.hb-row .bar{margin:0}
 
 .orb{position:relative;width:min(80vw,360px);aspect-ratio:1;margin:auto;border-radius:50%;background:radial-gradient(circle,rgba(46,168,255,.22),rgba(4,7,11,.92) 70%);box-shadow:0 0 70px rgba(46,168,255,.4),inset 0 0 50px rgba(159,233,255,.12);transition:filter .6s,box-shadow .6s}
 .orb.hot{box-shadow:0 0 90px rgba(125,255,184,.55),inset 0 0 60px rgba(125,255,184,.15)}
@@ -137,34 +143,80 @@ main{max-width:1120px;margin:0 auto;padding:0 1.5rem 3rem;display:grid;gap:1.25r
 @keyframes breathe{50%{transform:scale(1.35);opacity:.7}}
 .orb .dist{position:absolute;left:0;right:0;bottom:-2.3rem;text-align:center;font:900 1.4rem "Big Shoulders Display",Impact,sans-serif;letter-spacing:.04em}
 
+/* phase-driven motion budget */
+[data-phase="LIVE"] .sweep{animation-duration:8s}
+[data-phase="WAITING"] .sweep{animation-duration:3s;opacity:.6}
+[data-phase="OFFLINE"] .sweep{animation-play-state:paused;opacity:.1}
+[data-phase="OFFLINE"] .core{animation-play-state:paused;opacity:.3}
+[data-phase="OFFLINE"] .blip::after{animation-play-state:paused}
+.page-hidden .aurora i,
+.page-hidden .fog i,
+.page-hidden .sweep,
+.page-hidden .core,
+.page-hidden .blip::after,
+.page-hidden .dot.live::after,
+.page-hidden .dot.init{animation-play-state:paused!important}
+
 .c-ctrl{grid-column:span 7}
-.c-pres{grid-column:span 5}
-.c-time{grid-column:span 7}
+.c-time{grid-column:span 5}
 .c-health{grid-column:span 5}
-.c-log{grid-column:1/-1}
-.power{display:flex;align-items:center;gap:1rem;margin-bottom:1.1rem}
+.c-log{grid-column:span 7}
+
+.power{display:flex;align-items:center;gap:1rem;margin:1rem 0}
 .bulb{width:58px;height:58px;border-radius:50%;background:#0b1520;border:2px solid #1f3346;transition:all .6s;position:relative;flex:none}
 .bulb.on{background:radial-gradient(circle,#eafff5,var(--green));border-color:var(--green);box-shadow:0 0 40px 8px rgba(125,255,184,.5)}
 .power b{font:900 2.2rem "Big Shoulders Display",Impact,sans-serif;text-transform:uppercase;display:block;line-height:1}
+.power .mute{display:block;margin-top:.15rem}
+
 .row{display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.8rem}
-.banner{background:rgba(255,193,77,.12);border:1px solid var(--warn);color:var(--warn);padding:.7rem 1rem;border-radius:12px;margin-bottom:1rem;animation:shake .6s}
-@keyframes shake{20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+
+/* segmented control */
+.seg{display:flex;background:rgba(255,255,255,.05);border:1px solid rgba(120,190,230,.3);border-radius:999px;padding:4px;gap:4px;margin-bottom:1rem}
+.seg-btn{border:1px solid transparent!important;background:transparent;padding:.55rem 1rem;border-radius:999px;flex:1;font-size:.85rem;transition:background .3s,color .3s,box-shadow .3s}
+.seg-btn[aria-pressed="true"]{background:linear-gradient(120deg,var(--blue-deep),var(--blue));color:#fff;box-shadow:0 4px 20px rgba(46,168,255,.4)}
+.seg-btn:hover:not(:disabled):not([aria-pressed="true"]){border-color:var(--ice)!important;box-shadow:none}
+
+/* power button */
+.power-btn{width:100%;padding:1rem;font-size:1rem;letter-spacing:.03em}
+.power-btn.primary{background:linear-gradient(120deg,var(--blue-deep),var(--blue));border-color:transparent;color:#fff}
+.power-btn.primary:hover:not(:disabled){box-shadow:0 0 26px rgba(46,168,255,.6)}
+.power-btn.danger{background:rgba(255,107,122,.1);border-color:var(--bad);color:var(--bad)}
+.power-btn.danger:hover:not(:disabled){background:rgba(255,107,122,.18);box-shadow:0 0 22px rgba(255,107,122,.4)}
+
+.reason{font-size:.8rem;color:var(--mute);margin-top:.7rem;min-height:1.2em;line-height:1.4}
+
+.banner{grid-column:1/-1;background:rgba(255,193,77,.12);border:1px solid var(--warn);color:var(--warn);padding:.7rem 1rem;border-radius:12px;font-size:.85rem;font-weight:600}
+.banner.info{background:rgba(46,168,255,.1);border-color:var(--blue);color:var(--ice)}
+.banner.off{background:rgba(255,107,122,.1);border-color:var(--bad);color:var(--bad)}
 
 .bar{height:10px;background:rgba(255,255,255,.06);border-radius:9px;overflow:hidden;margin:.3rem 0 1rem}
 .bar i{display:block;height:100%;width:0;border-radius:9px;background:linear-gradient(90deg,var(--blue-deep),var(--ice));transition:width .8s cubic-bezier(.2,.8,.2,1)}
 .bar.s i{background:linear-gradient(90deg,var(--green-dim),var(--green))}
-.rings{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:1rem}
-.tr{text-align:center}
+
+.rings{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1rem}
+.tr{text-align:center;transition:opacity .4s}
+.tr[hidden]{display:none}
 .tr svg{width:84px;height:84px;transform:rotate(-90deg)}
 .tr circle{fill:none;stroke-width:6;stroke-linecap:round}
 .tr .bg{stroke:rgba(255,255,255,.07)}
 .tr .fg{stroke:url(#g);stroke-dasharray:163.4;stroke-dashoffset:163.4;transition:stroke-dashoffset 1s linear}
 .tr .v{display:block;margin-top:-62px;height:62px;font:900 1.5rem/62px "Big Shoulders Display",Impact,sans-serif}
 .tr .mute{display:block;margin-top:.4rem}
+
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
 .grid2 b{display:block;font:900 1.7rem "Big Shoulders Display",Impact,sans-serif}
+.grid2 b#hRssi{display:flex;align-items:center;gap:.4rem;font:800 .9rem Manrope,sans-serif;margin-top:.2rem}
 
-ul.tl{list-style:none;margin:0;padding:0 0 0 1.2rem;border-left:2px solid rgba(120,190,230,.2);max-height:380px;overflow:auto}
+.rssi-bars{display:inline-flex;gap:2px;align-items:flex-end;height:14px}
+.rssi-bars i{width:3px;background:rgba(120,190,230,.2);border-radius:1px}
+.rssi-bars i:nth-child(1){height:35%}
+.rssi-bars i:nth-child(2){height:55%}
+.rssi-bars i:nth-child(3){height:75%}
+.rssi-bars i:nth-child(4){height:100%}
+.rssi-bars i.on{background:var(--green)}
+
+ul.tl{list-style:none;margin:0;padding:0 0 0 1.2rem;border-left:2px solid rgba(120,190,230,.2);max-height:380px;overflow:auto;transition:opacity .4s}
+ul.tl.dim{opacity:.5}
 ul.tl li{padding:.5rem 0 .5rem 1rem;position:relative}
 ul.tl li::before{content:"";position:absolute;left:-1.7rem;top:.95rem;width:12px;height:12px;border-radius:50%;background:var(--blue);box-shadow:0 0 12px var(--blue)}
 ul.tl li.ok::before{background:var(--green);box-shadow:0 0 12px var(--green)}
@@ -176,10 +228,10 @@ ul.tl li.new{animation:slide .7s cubic-bezier(.2,.8,.2,1)}
 @keyframes rise{from{opacity:0;transform:translateY(28px) scale(.97)}}
 
 #login{min-height:88vh;display:grid;place-items:center;text-align:center;padding:1.5rem}
-#login h1{font-size:clamp(3.5rem,14vw,8rem);background:linear-gradient(100deg,#fff,#bfe9ff 40%,var(--green));-webkit-background-clip:text;background-clip:text;color:transparent}
-#login .logo{display:block;width:clamp(180px,34.5vw,390px);height:auto;margin:0 auto 1.2rem;filter:drop-shadow(0 0 40px rgba(46,168,255,.5)) drop-shadow(0 0 10px rgba(159,233,255,.4))}
+#login h1{font-size:clamp(2rem,5.5vw,2.75rem);letter-spacing:.18em;background:linear-gradient(100deg,#fff,#bfe9ff 40%,var(--green));-webkit-background-clip:text;background-clip:text;color:transparent;margin-top:.6rem}
+#login .logo{display:block;width:clamp(140px,22vw,220px);height:auto;margin:0 auto;filter:drop-shadow(0 0 40px rgba(46,168,255,.5)) drop-shadow(0 0 10px rgba(159,233,255,.4))}
 #login p{max-width:420px;margin:1rem auto 1.6rem;color:var(--mute)}
-#loginErr{color:var(--bad)!important;min-height:1.5em}
+#loginErr{color:var(--bad)!important;min-height:1.5em;font-size:.85rem}
 
 #toasts{position:fixed;right:1rem;bottom:1rem;display:grid;gap:.6rem;z-index:20}
 .toast{background:rgba(10,18,26,.96);border:1px solid var(--blue);padding:.8rem 1.1rem;border-radius:14px;max-width:320px;animation:tin .5s cubic-bezier(.2,1.2,.4,1);box-shadow:0 10px 40px rgba(0,0,0,.5)}
@@ -189,10 +241,19 @@ ul.tl li.new{animation:slide .7s cubic-bezier(.2,.8,.2,1)}
 @keyframes tout{to{opacity:0;transform:translateX(60px)}}
 
 @media (max-width:820px){
-  .hero{grid-template-columns:1fr;text-align:center}.pills{justify-content:center}
-  .c-ctrl,.c-pres,.c-time,.c-health{grid-column:1/-1}.orb{margin-bottom:2.6rem}
+  .hero{grid-template-columns:1fr;text-align:center}
+  .pills{justify-content:center}
+  .hero-bars{margin-left:auto;margin-right:auto}
+  .c-ctrl,.c-time,.c-health,.c-log{grid-column:1/-1}
+  .orb{margin-bottom:2.6rem}
   .fog{height:55vh}
+  .aurora i{filter:blur(60px)}
 }
+
+@media (max-width:600px) {
+  #who { display: none; }
+}
+
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
@@ -202,30 +263,35 @@ ul.tl li.new{animation:slide .7s cubic-bezier(.2,.8,.2,1)}
 <div class="aurora"><i></i><i></i><i></i></div>
 <div class="fog" aria-hidden="true"><i class="f1"></i><i class="f2"></i><i class="f3"></i></div>
 
+<div id="srStatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
 <div id="login">
   <div>
     <img src="logo.png" alt="PhantomGuard logo" class="logo in" style="--i:0">
-    <h1 class="in">PhantomGuard</h1>
+    <h1 class="in" style="--i:1">PhantomGuard</h1>
     <p class="in" style="--i:2">Sign in with an authorized Google account to watch the room and control the relay.</p>
     <button class="primary in" style="--i:3" id="signin">Sign in with Google</button>
     <p id="loginErr"></p>
   </div>
 </div>
 
-<div id="app" class="hidden">
+<div id="app" class="hidden" data-phase="INIT">
   <header class="in">
     <div class="brand">
       <img src="logo.png" alt="PhantomGuard logo" class="brand-logo">
       <h1>PhantomGuard</h1>
-      <span class="dot init" id="hbDot"></span>
+      <span class="dot init" id="hbDot" aria-hidden="true"></span>
     </div>
     <div class="header-right">
-      <span class="mute" id="who"></span> 
+      <span class="fresh-chip init" id="freshChip">Connecting…</span>
+      <span class="mute" id="who"></span>
       <button id="signout">Sign out</button>
     </div>
   </header>
 
   <main>
+    <div id="stateBanner" class="banner info hidden" role="status"></div>
+
     <div class="hero" id="hero">
       <div class="in" style="--i:1">
         <div class="orb off" id="orb">
@@ -237,6 +303,10 @@ ul.tl li.new{animation:slide .7s cubic-bezier(.2,.8,.2,1)}
       <div class="in" style="--i:2">
         <h2 class="state init" id="presTxt">Initializing…</h2>
         <p class="sub" id="relayLine">Waiting for the device to check in.</p>
+        <div class="hero-bars">
+          <div class="hb-row"><span>Moving</span><b id="movV">–</b><div class="bar"><i id="movB"></i></div></div>
+          <div class="hb-row"><span>Stationary</span><b id="staV">–</b><div class="bar s"><i id="staB"></i></div></div>
+        </div>
         <div class="pills">
           <span class="pill idle" id="modePill">–</span>
           <span class="pill idle" id="outPill">–</span>
@@ -247,31 +317,16 @@ ul.tl li.new{animation:slide .7s cubic-bezier(.2,.8,.2,1)}
 
     <section class="card c-ctrl in" style="--i:3" id="cardCtrl">
       <h2>Control</h2>
-      <div id="radarWarn" class="banner hidden">Radar disconnected. System is running on manual fallback.</div>
+      <div class="seg" role="group" aria-label="Control mode">
+        <button class="seg-btn" id="segAuto" aria-pressed="false" disabled>Auto mode</button>
+        <button class="seg-btn" id="segManual" aria-pressed="false" disabled>Manual override</button>
+      </div>
       <div class="power"><div class="bulb" id="bulb"></div><div><b id="relayTxt">Initializing…</b><span class="mute" id="modeHint"></span></div></div>
-      <div class="row">
-        <button class="primary" id="bAuto" disabled>Auto mode</button>
-        <button id="bOverride" disabled>Manual override</button>
-      </div>
-      <div class="row">
-        <button id="bOn" disabled>Turn ON</button>
-        <button class="danger" id="bOff" disabled>Turn OFF</button>
-      </div>
+      <button class="power-btn primary" id="bPower" disabled>Turn ON</button>
+      <p class="reason" id="powerReason" aria-live="polite"></p>
     </section>
 
-    <section class="card c-pres in" style="--i:4" id="cardPres">
-      <h2>Radar energy</h2>
-      <div class="mute">Moving <b id="movV">–</b></div><div class="bar"><i id="movB"></i></div>
-      <div class="mute">Stationary <b id="staV">–</b></div><div class="bar s"><i id="staB"></i></div>
-    </section>
-
-    <section class="card c-time in" style="--i:5" id="cardTime">
-      <h2>Timers</h2>
-      <svg width="0" height="0"><defs><linearGradient id="g"><stop offset="0" stop-color="#2ea8ff"/><stop offset="1" stop-color="#7dffb8"/></linearGradient></defs></svg>
-      <div class="rings" id="rings"></div>
-    </section>
-
-    <section class="card c-health in" style="--i:6" id="cardHealth">
+    <section class="card c-health in" style="--i:4" id="cardHealth">
       <h2>Device health</h2>
       <div class="grid2">
         <div class="mute">WiFi signal<b id="hRssi">–</b></div>
@@ -281,13 +336,19 @@ ul.tl li.new{animation:slide .7s cubic-bezier(.2,.8,.2,1)}
       </div>
     </section>
 
-    <section class="card c-log in" style="--i:7" id="cardLog">
-      <h2>History <span class="tag" id="logTag"></span></h2>
-      <ul class="tl" id="log"><li class="mute">No events yet.</li></ul>
+    <section class="card c-time in" style="--i:5" id="cardTime">
+      <h2>Timers</h2>
+      <svg width="0" height="0"><defs><linearGradient id="g"><stop offset="0" stop-color="#2ea8ff"/><stop offset="1" stop-color="#7dffb8"/></linearGradient></defs></svg>
+      <div class="rings" id="rings"></div>
+    </section>
+
+    <section class="card c-log in" style="--i:6" id="cardLog">
+      <h2>History</h2>
+      <ul class="tl" id="log" aria-live="polite"><li class="mute">No events yet.</li></ul>
     </section>
   </main>
 </div>
-<div id="toasts"></div>
+<div id="toasts" aria-live="polite" aria-atomic="false"></div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
@@ -323,11 +384,22 @@ let pending = null;
 let ang = 300;
 let latestLog = [];
 const seenLog = new Set();
+let prevPhase = "INIT", prevPresence = null, prevRelay = null;
 
 let unsubStatus = null;
 let unsubLog = null;
 let tickInterval = null;
 
+/* ---------- a11y announcer ---------- */
+let srTimer;
+function announce(msg) {
+  const el = $("srStatus");
+  clearTimeout(srTimer);
+  el.textContent = "";
+  srTimer = setTimeout(() => { el.textContent = msg; }, 60);
+}
+
+/* ---------- input cosmetics ---------- */
 document.addEventListener("pointermove", e => {
   const c = e.target.closest && e.target.closest(".card"); if (!c) return;
   const r = c.getBoundingClientRect();
@@ -341,7 +413,11 @@ document.addEventListener("click", e => {
   d.style.cssText = `width:${s}px;height:${s}px;left:${e.clientX - r.left - s/2}px;top:${e.clientY - r.top - s/2}px`;
   b.append(d); setTimeout(() => d.remove(), 650);
 });
+document.addEventListener("visibilitychange", () => {
+  document.body.classList.toggle("page-hidden", document.hidden);
+});
 
+/* ---------- small helpers ---------- */
 function tween(el, to, suffix = "") {
   const from = el._v ?? to; el._v = to;
   if (from === to) { el.textContent = to + suffix; return; }
@@ -380,21 +456,40 @@ const fmtUp = s => {
   const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
   return (d ? d + "d " : "") + h + "h " + m + "m";
 };
+const relTime = ts => {
+  if (typeof ts !== "number" || ts < 1e12) return null;
+  const d = Date.now() - ts;
+  if (d < 30000) return "just now";
+  if (d < 60000) return Math.floor(d/1000) + "s ago";
+  if (d < 3600000) return Math.floor(d/60000) + " min ago";
+  if (d < 86400000) return Math.floor(d/3600000) + "h ago";
+  return new Date(ts).toLocaleDateString();
+};
 const left = k => st ? Math.max(0, (st[k] || 0) - Math.floor((Date.now() - stRecvAt) / 1000)) : 0;
 
+/* ---------- timers config (mode-aware) ---------- */
 const TIMERS = [
-  ["cooldownLeftS", "Auto cooldown"],
-  ["absenceLeftS", "Absence delay"],
-  ["manualLimitLeftS", "Manual limit"],
-  ["manualTimeoutLeftS", "Manual timeout"]
+  { k: "cooldownLeftS",      name: "Auto cooldown",  mode: "auto" },
+  { k: "absenceLeftS",       name: "Absence delay",  mode: "auto" },
+  { k: "manualLimitLeftS",   name: "Manual limit",   mode: "manual" },
+  { k: "manualTimeoutLeftS", name: "Manual timeout", mode: "manual" }
 ];
 const maxSeen = {};
-$("rings").innerHTML = TIMERS.map(([k, n]) =>
-  `<div class="tr"><svg viewBox="0 0 60 60"><circle class="bg" cx="30" cy="30" r="26"/><circle class="fg" id="f_${k}" cx="30" cy="30" r="26"/></svg><span class="v" id="v_${k}">–</span><span class="mute">${n}</span></div>`
+$("rings").innerHTML = TIMERS.map(({k, name, mode}) =>
+  `<div class="tr" data-mode="${mode}"><svg viewBox="0 0 60 60"><circle class="bg" cx="30" cy="30" r="26"/><circle class="fg" id="f_${k}" cx="30" cy="30" r="26"/></svg><span class="v" id="v_${k}">–</span><span class="mute">${name}</span></div>`
 ).join("");
 
-$("signin").onclick = () => signInWithPopup(auth, new GoogleAuthProvider())
-  .catch(e => $("loginErr").textContent = e.message);
+/* ---------- auth ---------- */
+$("signin").onclick = async () => {
+  const btn = $("signin");
+  const orig = btn.textContent;
+  btn.disabled = true;
+  btn.textContent = "Signing in…";
+  $("loginErr").textContent = "";
+  try { await signInWithPopup(auth, new GoogleAuthProvider()); }
+  catch (e) { $("loginErr").textContent = e.message; }
+  finally { btn.disabled = false; btn.textContent = orig; }
+};
 $("signout").onclick = () => signOut(auth);
 
 onAuthStateChanged(auth, u => {
@@ -431,6 +526,7 @@ function startSession() {
   everLive = false;
   startedAt = Date.now();
   phase = "INIT";
+  prevPhase = "INIT"; prevPresence = null; prevRelay = null;
   latestLog = [];
   seenLog.clear();
   ang = 300;
@@ -448,10 +544,10 @@ function startSession() {
 
     st = v;
     stRecvAt = now;
-    for (const [k] of TIMERS) maxSeen[k] = Math.max(maxSeen[k] || 1, v[k] || 0);
+    for (const {k} of TIMERS) maxSeen[k] = Math.max(maxSeen[k] || 1, v[k] || 0);
     if (fresh) { confirmedAt = now; everLive = true; }
 
-    ang += (Math.random() - .5) * 40;
+    ang += (Math.random() - .5) * 26;
     checkPending();
     render();
   }, e => toast("Status read failed: " + e.message, "bad"));
@@ -477,12 +573,13 @@ function startSession() {
   render();
 }
 
+/* ---------- commands ---------- */
 function send(action) {
   if (pending) { toast("Please wait for the previous command to finish.", ""); return; }
   if (phase !== "LIVE" || !st) { toast("The system is not online right now.", "bad"); return; }
 
   if ((action === "on" || action === "off") && !st.manual) {
-    toast("Click Manual override before turning the relay on or off.", "bad"); return;
+    toast("Switch to Manual override before turning the relay on or off.", "bad"); return;
   }
   if (action === "on"  &&  st.relayOn) { toast("Relay is already ON — nothing to change.", ""); return; }
   if (action === "off" && !st.relayOn) { toast("Relay is already OFF — nothing to change.", ""); return; }
@@ -518,10 +615,9 @@ function send(action) {
   pending.timer = setTimeout(() => onPendingTimeout(id), PENDING_TIMEOUT_MS);
   render();
 }
-$("bAuto").onclick     = () => send("auto");
-$("bOverride").onclick = () => send("override");
-$("bOn").onclick       = () => send("on");
-$("bOff").onclick      = () => send("off");
+$("segAuto").onclick   = () => send("auto");
+$("segManual").onclick = () => send("override");
+$("bPower").onclick    = () => { if (!st) return; send(st.relayOn ? "off" : "on"); };
 
 function stateMatches() {
   if (!pending || !st) return false;
@@ -536,13 +632,10 @@ function stateMatches() {
 function checkPending() {
   if (!pending) return;
   const lc = st?.lastCmd;
-  const action = pending.action;
-
   if (lc && lc.cmdId !== undefined && String(lc.cmdId) === String(pending.id)) {
     resolvePending(lc.result, lc.retryAfterS);
     return;
   }
-
   if (Date.now() - pending.since > STATE_MATCH_DELAY_MS && stateMatches()) {
     resolvePending(1);
   }
@@ -596,6 +689,7 @@ function onPendingTimeout(id) {
   render();
 }
 
+/* ---------- phase ---------- */
 function computePhase(now) {
   if (!startedAt || now - startedAt < MIN_INIT_MS) return "INIT";
   if (!st) return (now - startedAt > NO_DATA_MS) ? "OFFLINE" : "INIT";
@@ -607,53 +701,121 @@ function computePhase(now) {
 }
 
 function renderHeader() {
-  const map = {
-    INIT:    "init",
-    LIVE:    "live",
-    WAITING: "wait",
-    OFFLINE: "off"
-  };
+  const map = { INIT: "init", LIVE: "live", WAITING: "wait", OFFLINE: "off" };
   $("hbDot").className = "dot " + map[phase];
 }
 
-function updateControls() {
-  if (pending) {
-    for (const id of ["bAuto", "bOverride", "bOn", "bOff"]) $(id).disabled = true;
-    setBtn($("bAuto"), "Auto mode");
-    setBtn($("bOverride"), "Manual override");
-    setBtn($("bOn"), "Turn ON");
-    setBtn($("bOff"), "Turn OFF");
-    const btn = { on: $("bOn"), off: $("bOff"), override: $("bOverride"), auto: $("bAuto") }[pending.action];
-    if (btn) setBtn(btn, "Sending…");
-    return;
+function updateFreshChip(now) {
+  const chip = $("freshChip");
+  let text, cls;
+  if (phase === "INIT") { text = "Connecting…"; cls = "fresh-chip init"; }
+  else if (phase === "OFFLINE") { text = "Offline"; cls = "fresh-chip off"; }
+  else {
+    const age = Math.max(0, Math.floor((now - confirmedAt) / 1000));
+    if (phase === "LIVE") {
+      text = age < 2 ? "Live now" : `Updated ${age}s ago`;
+      cls = "fresh-chip live";
+    } else {
+      text = `Last update ${age}s ago`;
+      cls = "fresh-chip wait";
+    }
   }
-
-  if (phase !== "LIVE" || !st) {
-    for (const id of ["bAuto", "bOverride", "bOn", "bOff"]) $(id).disabled = true;
-    setBtn($("bAuto"), "Auto mode");
-    setBtn($("bOverride"), "Manual override");
-    setBtn($("bOn"), "Turn ON");
-    setBtn($("bOff"), "Turn OFF");
-    return;
-  }
-
-  const lim = left("manualLimitLeftS");
-  $("bAuto").disabled     = !st.manual || !st.radarConnected;
-  $("bOverride").disabled = st.manual;
-  $("bOn").disabled       = !st.manual || lim > 0;
-  $("bOff").disabled      = !st.manual || lim > 0;
-  setBtn($("bAuto"), "Auto mode");
-  setBtn($("bOverride"), "Manual override");
-  setBtn($("bOn"),  lim > 0 ? "Wait " + lim + "s…" : "Turn ON");
-  setBtn($("bOff"), lim > 0 ? "Wait " + lim + "s…" : "Turn OFF");
+  if (chip.textContent !== text) chip.textContent = text;
+  if (chip.className !== cls) chip.className = cls;
 }
 
+function updateStateBanner(now) {
+  const b = $("stateBanner");
+  let msg = "", cls = "";
+  if (phase === "OFFLINE") {
+    msg = everLive ? "Device offline. Showing last known values." : "Waiting for the device to check in.";
+    cls = "banner off";
+  } else if (phase === "WAITING") {
+    const age = Math.max(0, Math.floor((now - confirmedAt) / 1000));
+    msg = `Data paused — last update ${age}s ago.`;
+    cls = "banner";
+  } else if (phase === "LIVE" && st && !st.radarConnected) {
+    msg = "Radar disconnected. Auto mode unavailable.";
+    cls = "banner";
+  } else if (phase === "INIT") {
+    msg = "Connecting to the device…";
+    cls = "banner info";
+  }
+  if (msg) {
+    if (b.textContent !== msg) b.textContent = msg;
+    b.className = cls;
+  } else {
+    b.className = "banner hidden";
+  }
+}
+
+/* ---------- controls ---------- */
+function updateControls() {
+  const segA = $("segAuto"), segM = $("segManual"), pow = $("bPower"), reason = $("powerReason");
+  const lim = (phase === "LIVE" && st) ? left("manualLimitLeftS") : 0;
+
+  // Pending: lock everything, show which is in flight
+  if (pending) {
+    segA.disabled = segM.disabled = pow.disabled = true;
+    segA.setAttribute("aria-pressed", "false");
+    segM.setAttribute("aria-pressed", "false");
+    setBtn(segA, "Auto mode");
+    setBtn(segM, "Manual override");
+    if (pending.action === "auto")     setBtn(segA, "Sending…");
+    if (pending.action === "override") setBtn(segM, "Sending…");
+    if (pending.action === "on" || pending.action === "off") setBtn(pow, "Sending…");
+    reason.textContent = "Waiting for the device to confirm…";
+    return;
+  }
+
+  // Not live: disable everything with a reason
+  if (phase !== "LIVE" || !st) {
+    segA.disabled = segM.disabled = pow.disabled = true;
+    segA.setAttribute("aria-pressed", "false");
+    segM.setAttribute("aria-pressed", "false");
+    setBtn(segA, "Auto mode");
+    setBtn(segM, "Manual override");
+    const on = !!st?.relayOn;
+    setBtn(pow, on ? "Turn OFF" : "Turn ON");
+    pow.classList.toggle("primary", !on);
+    pow.classList.toggle("danger", on);
+    reason.textContent = phase === "OFFLINE"
+      ? "Waiting for the device to come back online."
+      : "Waiting for the device to check in.";
+    return;
+  }
+
+  // Live
+  const manual = !!st.manual;
+  segA.disabled = !manual || !st.radarConnected;
+  segM.disabled = manual;
+  segA.setAttribute("aria-pressed", String(!manual));
+  segM.setAttribute("aria-pressed", String(manual));
+  setBtn(segA, "Auto mode");
+  setBtn(segM, "Manual override");
+
+  const on = !!st.relayOn;
+  pow.disabled = !manual || lim > 0;
+  setBtn(pow, lim > 0 ? `Wait ${lim}s…` : (on ? "Turn OFF" : "Turn ON"));
+  pow.classList.toggle("primary", !on);
+  pow.classList.toggle("danger", on);
+
+  if (!manual) reason.textContent = st.radarConnected
+    ? "Switch to Manual override to control the relay."
+    : "Radar disconnected — Auto mode is running on manual fallback.";
+  else if (lim > 0) reason.textContent = `Wait ${lim}s before changing the relay again.`;
+  else reason.textContent = on
+    ? "Relay is ON. Turn it off when you leave."
+    : "Relay is OFF. Turn it on when needed.";
+}
+
+/* ---------- main render ---------- */
 function renderLive(now) {
   const live    = phase === "LIVE";
   const waiting = phase === "WAITING";
   const haveData = !!st && (live || waiting);
 
-  for (const id of ["cardCtrl", "cardPres", "cardTime", "cardHealth"]) {
+  for (const id of ["cardCtrl", "cardTime", "cardHealth"]) {
     $(id).classList.toggle("stale", waiting);
   }
   $("hero").classList.toggle("stale", waiting);
@@ -675,13 +837,12 @@ function renderLive(now) {
     setPill($("modePill"), "–", "idle");
     setPill($("outPill"), "–", "idle");
     setPill($("radarPill"), "–", "idle");
-    $("radarWarn").classList.add("hidden");
     $("bulb").classList.remove("on");
     $("relayTxt").textContent = msg;
     $("modeHint").textContent = phase === "OFFLINE" ? "Controls are disabled while offline." : "";
     $("movV").textContent = "–"; $("movB").style.width = "0%";
     $("staV").textContent = "–"; $("staB").style.width = "0%";
-    for (const [k] of TIMERS) {
+    for (const {k} of TIMERS) {
       $("v_" + k).textContent = "–";
       $("f_" + k).style.strokeDashoffset = "163.4";
     }
@@ -700,42 +861,56 @@ function renderLive(now) {
     $("presTxt").textContent = present ? "Someone’s here" : "Room empty";
     $("presTxt").classList.toggle("hot", present && live);
   }
-  
+
   $("relayLine").textContent = "Appliance power is " + (st.relayOn ? "on" : "off")
     + (st.manual ? ", controlled by you." : ", controlled automatically.");
-  $("distTxt").innerHTML = present ? "Target at " + st.detDist + " cm" : "&nbsp;";
+
+  // Distance + honest blip (snap to the 3 rings) - with undefined fallback
+  $("distTxt").innerHTML = present ? "Target at " + (st.detDist || 0) + " cm" : "&nbsp;";
   $("blip").style.opacity = (present && live) ? "1" : "0";
   if (present) {
-    const rr = Math.min(1, (st.detDist || 0) / 600) * 0.44 + 0.04;
+    const cm = st.detDist || 0;
+    const rr = cm < 150 ? 0.125 : cm < 300 ? 0.25 : 0.375;
     const rad = ang * Math.PI / 180;
     $("blip").style.left = (50 + Math.cos(rad) * rr * 100) + "%";
     $("blip").style.top  = (50 + Math.sin(rad) * rr * 100) + "%";
   }
 
-  setPill($("modePill"), st.manual ? "Manual override" : "Auto mode", st.manual ? "warn" : "ok");
-  setPill($("outPill"),  "OUT pin " + (st.outHigh ? "high" : "low"), st.outHigh ? "ok" : "");
-  setPill($("radarPill"), st.radarConnected ? "Radar linked" : "Radar lost", st.radarConnected ? "ok" : "bad");
+  // Pills — glyph + text (never color-only)
+  setPill($("modePill"),  (st.manual ? "◎ Manual override" : "◉ Auto mode"), st.manual ? "warn" : "ok");
+  setPill($("outPill"),   (st.outHigh ? "▲ OUT high" : "▼ OUT low"), st.outHigh ? "ok" : "");
+  setPill($("radarPill"), (st.radarConnected ? "✓ Radar linked" : "✕ Radar lost"), st.radarConnected ? "ok" : "bad");
 
-  $("radarWarn").classList.toggle("hidden", !(live && !st.radarConnected));
+  // Relay
   $("bulb").classList.toggle("on", !!st.relayOn);
   $("relayTxt").textContent = st.relayOn ? "Power ON" : "Power OFF";
   $("modeHint").textContent = st.manual
     ? "Back to Auto in " + left("manualTimeoutLeftS") + "s"
     : "Click Manual override to take control";
 
+  // Radar energy
   tween($("movV"), st.moving || 0);
   tween($("staV"), st.stationary || 0);
   $("movB").style.width = Math.min(100, st.moving || 0) + "%";
   $("staB").style.width = Math.min(100, st.stationary || 0) + "%";
 
-  for (const [k] of TIMERS) {
+  // Mode-aware timers
+  const activeMode = st.manual ? "manual" : "auto";
+  document.querySelectorAll("#rings .tr").forEach(tr => {
+    tr.hidden = tr.dataset.mode !== activeMode;
+  });
+  for (const {k} of TIMERS) {
     let v = left(k);
     if (k === "manualTimeoutLeftS" && !st.manual) v = 0;
     $("v_" + k).textContent = v;
     $("f_" + k).style.strokeDashoffset = 163.4 * (1 - Math.min(1, v / maxSeen[k]));
   }
 
-  $("hRssi").textContent  = (st.rssi ?? 0) + " dBm";
+  // Health
+  const rssi = st.rssi ?? 0;
+  const bars = rssi >= -55 ? 4 : rssi >= -67 ? 3 : rssi >= -75 ? 2 : rssi >= -85 ? 1 : 0;
+  const barsHtml = `<span class="rssi-bars">${[1,2,3,4].map(n => `<i class="${n <= bars ? "on" : ""}"></i>`).join("")}</span>`;
+  $("hRssi").innerHTML = `${barsHtml}<span>${rssi} dBm</span>`;
   $("hUp").textContent    = fmtUp(st.uptimeS + Math.floor((Date.now() - stRecvAt) / 1000));
   $("hDrops").textContent = st.drops ?? 0;
   $("hRadar").textContent = st.radarConnected ? "Connected" : "Disconnected";
@@ -745,19 +920,41 @@ function renderLive(now) {
 
 function render() {
   const now = Date.now();
-  const prev = phase;
   phase = computePhase(now);
+  $("app").dataset.phase = phase;
   renderHeader();
+  updateFreshChip(now);
+  updateStateBanner(now);
   renderLive(now);
-  if (phase !== prev) {
-    paintLog();
+
+  // A11y announcements on meaningful transitions
+  if (phase !== prevPhase) {
+    announce(
+      phase === "LIVE" ? "Live — device connected" :
+      phase === "WAITING" ? "Connection unstable, data paused" :
+      phase === "OFFLINE" ? "Device offline" :
+      "Connecting to device"
+    );
     const hero = $("hero");
     hero.classList.remove("transition-flash");
     void hero.offsetWidth;
     hero.classList.add("transition-flash");
+    paintLog();
+    prevPhase = phase;
+  }
+  if (st && phase === "LIVE") {
+    if (prevPresence !== null && prevPresence !== !!st.presence) {
+      announce(st.presence ? "Someone detected in the room" : "Room is empty");
+    }
+    prevPresence = !!st.presence;
+    if (prevRelay !== null && prevRelay !== !!st.relayOn) {
+      announce(st.relayOn ? "Relay turned on" : "Relay turned off");
+    }
+    prevRelay = !!st.relayOn;
   }
 }
 
+/* ---------- log ---------- */
 function describe(e) {
   const parts = [];
   const changedStr = typeof e.changed === "string" ? e.changed : String(e.changed ?? "");
@@ -770,26 +967,15 @@ function describe(e) {
 }
 
 function paintLog() {
-  const ul = $("log"), tag = $("logTag");
-
-  if (phase === "OFFLINE" || phase === "INIT") {
-    tag.textContent = phase === "OFFLINE" ? "offline" : "init";
-    const li = document.createElement("li");
-    li.className = "mute";
-    li.textContent = phase === "OFFLINE" 
-      ? "History is hidden while the device is offline." 
-      : "History is hidden while initializing.";
-    ul.replaceChildren(li);
-    return;
-  }
-  tag.textContent = phase === "WAITING" ? "stale" : "";
+  const ul = $("log");
+  ul.classList.toggle("dim", phase === "OFFLINE" || phase === "WAITING");
 
   const frag = document.createDocumentFragment();
 
   if (!Array.isArray(latestLog) || latestLog.length === 0) {
     const li = document.createElement("li");
     li.className = "mute";
-    li.textContent = "No events yet.";
+    li.textContent = phase === "OFFLINE" ? "No events cached." : "No events yet.";
     frag.append(li);
   } else {
     latestLog.forEach((e, i) => {
@@ -803,14 +989,18 @@ function paintLog() {
         if (isNew) cls.push("new");
         li.className = cls.join(" ");
         if (isNew) li.style.animationDelay = Math.min(i, 12) * 60 + "ms";
-        const when = typeof e.ts === "number" && e.ts > 1e12
-          ? new Date(e.ts).toLocaleString()
-          : "uptime " + fmtUp(e.uptimeS || 0);
+
+        let when;
+        const rel = relTime(e.ts);
+        if (rel) when = rel + (e.ts > 1e12 ? " · " + new Date(e.ts).toLocaleTimeString() : "");
+        else when = "uptime " + fmtUp(e.uptimeS || 0);
+
         const d1 = document.createElement("div");
         const d2 = document.createElement("div");
         d2.className = "mute";
         d1.textContent = describe(e);
         d2.textContent = when;
+        if (typeof e.ts === "number" && e.ts > 1e12) d2.title = new Date(e.ts).toLocaleString();
         li.append(d1, d2);
         frag.append(li);
       } catch (err) {
