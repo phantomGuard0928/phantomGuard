@@ -552,7 +552,7 @@ function startSession() {
     render();
   }, e => toast("Status read failed: " + e.message, "bad"));
 
-  unsubLog = onValue(query(ref(db, BASE + "/log"), limitToLast(40)), snap => {
+  unsubLog = onValue(query(ref(db, BASE + "/log"), limitToLast(10)), snap => {
     const items = [];
     snap.forEach(c => {
       const val = c.val();
