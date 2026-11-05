@@ -163,7 +163,7 @@ main{max-width:1120px;margin:0 auto;padding:0 1.5rem 3rem;display:grid;gap:1.25r
 .seg-btn:hover:not(:disabled):not([aria-pressed="true"]){border-color:var(--ice)!important;box-shadow:none}
 
 /* Lockout mode special styling */
-#segLockout[aria-pressed="true"] { background: linear-gradient(120deg, #cc2a3a, var(--bad)); box-shadow: 0 4px 20px rgba(255,107,122,.4); color:#fff;}
+#segSecure-Off[aria-pressed="true"] { background: linear-gradient(120deg, #cc2a3a, var(--bad)); box-shadow: 0 4px 20px rgba(255,107,122,.4); color:#fff;}
 
 /* power button */
 .power-btn{width:100%;padding:1rem;font-size:1rem;letter-spacing:.03em}
