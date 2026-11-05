@@ -443,7 +443,7 @@ function updateControls() {
   if (phase !== "LIVE" || !st) {
     segA.disabled = segM.disabled = segL.disabled = pow.disabled = true;
     segA.setAttribute("aria-pressed", "false"); segM.setAttribute("aria-pressed", "false"); segL.setAttribute("aria-pressed", "false");
-    setBtn(segA, "Auto"); setBtn(segM, "Manual"); setBtn(segL, "Lockout");
+    setBtn(segA, "Auto"); setBtn(segM, "Manual"); setBtn(segL, "Secure Off");
     const on = !!st?.relayOn;
     setBtn(pow, on ? "Turn OFF" : "Turn ON");
     pow.classList.toggle("primary", !on);
@@ -544,7 +544,7 @@ function renderLive(now) {
 
   // Pills
   let modeText = "◉ Auto mode", modeCls = "ok";
-  if (st.forceOff) { modeText = "⊘ Lockout"; modeCls = "bad"; }
+  if (st.forceOff) { modeText = "⊘ Secure Off"; modeCls = "bad"; }
   else if (st.manual) { modeText = "◎ Manual override"; modeCls = "warn"; }
   setPill($("modePill"), modeText, modeCls);
 
