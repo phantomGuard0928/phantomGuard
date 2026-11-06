@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PhantomGuard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="aurora"><i></i><i></i><i></i></div>
+<div class="fog" aria-hidden="true"><i class="f1"></i><i class="f2"></i><i class="f3"></i></div>
+
+<div id="srStatus" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<div id="login">
+  <div>
+    <img src="logo.png" alt="PhantomGuard logo" class="logo in" style="--i:0">
+    <h1 class="in" style="--i:1">PhantomGuard</h1>
+    <p class="in" style="--i:2">Sign in with an authorized Google account to watch the room and control the relay.</p>
+    <button class="primary in" style="--i:3" id="signin">Sign in with Google</button>
+    <p id="loginErr"></p>
+  </div>
+</div>
+
+<div id="app" class="hidden" data-phase="INIT">
+  <header class="in">
+    <div class="brand">
+      <img src="logo.png" alt="PhantomGuard logo" class="brand-logo">
+      <h1>PhantomGuard</h1>
+      <span class="dot init" id="hbDot" aria-hidden="true"></span>
+    </div>
+    <div class="header-right">
+      <span class="fresh-chip init" id="freshChip">Connecting…</span>
+      <span class="mute" id="who"></span>
+      <button id="signout">Sign out</button>
+    </div>
+  </header>
+
+  <main>
+    <div id="stateBanner" class="banner info hidden" role="status"></div>
+
+    <div class="hero" id="hero">
+      <div class="in" style="--i:1">
+        <div class="orb off" id="orb">
+          <div class="ring r1"></div><div class="ring r2"></div><div class="ring r3"></div>
+          <div class="sweep"></div><div class="core"></div><div class="blip" id="blip"></div>
+          <div class="dist" id="distTxt">&nbsp;</div>
+        </div>
+      </div>
+      <div class="in" style="--i:2">
+        <h2 class="state init" id="presTxt">Initializing…</h2>
+        <p class="sub" id="relayLine">Waiting for the device to check in.</p>
+        <div class="hero-bars">
+          <div class="hb-row"><span>Moving</span><b id="movV">–</b><div class="bar"><i id="movB"></i></div></div>
+          <div class="hb-row"><span>Stationary</span><b id="staV">–</b><div class="bar s"><i id="staB"></i></div></div>
+        </div>
+        <div class="pills">
+          <span class="pill idle" id="modePill">–</span>
+          <span class="pill idle" id="outPill">–</span>
+          <span class="pill idle" id="radarPill">–</span>
+        </div>
+      </div>
+    </div>
+
+    <section class="card c-ctrl in" style="--i:3" id="cardCtrl">
+      <h2>Control</h2>
+      <div class="seg" role="group" aria-label="Control mode">
+        <button class="seg-btn" id="segAuto" aria-pressed="false" disabled>Auto</button>
+        <button class="seg-btn" id="segManual" aria-pressed="false" disabled>Manual</button>
+        <button class="seg-btn" id="segLockout" aria-pressed="false" disabled>Secure Off</button>
+      </div>
+      <div class="power"><div class="bulb" id="bulb"></div><div><b id="relayTxt">Initializing…</b><span class="mute" id="modeHint"></span></div></div>
+      <button class="power-btn primary" id="bPower" disabled>Turn ON</button>
+      <p class="reason" id="powerReason" aria-live="polite"></p>
+    </section>
+
+    <section class="card c-health in" style="--i:4" id="cardHealth">
+      <h2>Device health</h2>
+      <div class="grid2">
+        <div class="mute">WiFi signal<b id="hRssi">–</b></div>
+        <div class="mute">Uptime<b id="hUp">–</b></div>
+        <div class="mute">Radar drops<b id="hDrops">–</b></div>
+        <div class="mute">Radar link<b id="hRadar">–</b></div>
+      </div>
+    </section>
+
+    <section class="card c-time in" style="--i:5" id="cardTime">
+      <h2>Timers</h2>
+      <svg width="0" height="0"><defs><linearGradient id="g"><stop offset="0" stop-color="#2ea8ff"/><stop offset="1" stop-color="#7dffb8"/></linearGradient></defs></svg>
+      <div class="rings" id="rings"></div>
+    </section>
+
+    <section class="card c-config in" style="--i:6" id="cardConfig">
+      <h2>Device Settings</h2>
+      <div class="setting-row">
+        <label>Absence Delay</label>
+        <select id="cfgAbsence" disabled>
+          <option value="30">30 seconds</option>
+          <option value="60">1 minute</option>
+          <option value="120">2 minutes</option>
+          <option value="300">5 minutes</option>
+          <option value="600">10 minutes</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <label>Auto Cooldown</label>
+        <select id="cfgCooldown" disabled>
+          <option value="15">15 seconds</option>
+          <option value="30">30 seconds</option>
+          <option value="60">1 minute</option>
+        </select>
+      </div>
+    </section>
+
+    <section class="card c-log in" style="--i:7" id="cardLog">
+      <h2>History</h2>
+      <ul class="tl" id="log" aria-live="polite"><li class="mute">No events yet.</li></ul>
+    </section>
+  </main>
+</div>
+<div id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>
