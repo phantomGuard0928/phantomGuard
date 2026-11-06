@@ -1070,6 +1070,9 @@ function describe(e) {
     else parts.push("Switched to Auto");
   }
   if (ch.includes("presence")) parts.push(e.presence ? "Person detected" : "Room became empty");
+  // ADD THIS LINE:
+  if (ch.includes("radar")) parts.push(e.radarConnected ? "Radar reconnected" : "Radar signal lost");
+  
   if (e.cmdResult && e.cmdResult > 2) parts.push("Command rejected (code " + e.cmdResult + ")");
   return parts.length ? parts.join(" · ") : (changedStr || "Event");
 }
