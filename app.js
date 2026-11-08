@@ -106,6 +106,13 @@ const fmtUp = s => {
   const d = Math.floor(s / 86400), h = Math.floor(s % 86400 / 3600), m = Math.floor(s % 3600 / 60);
   return (d ? d + "d " : "") + h + "h " + m + "m";
 };
+const fmtTimer = s => {
+  s = Math.floor(s);
+  const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
+  if (h > 0) return `${h}h ${m}m`;
+  if (m > 0) return `${m}m ${sec}s`;
+  return `${sec}s`;
+};
 const relTime = ts => {
   if (typeof ts !== "number" || ts < 1e12) return null;
   const d = Date.now() - ts;
@@ -117,12 +124,13 @@ const relTime = ts => {
 };
 const left = k => st ? Math.max(0, (st[k] || 0) - Math.floor((Date.now() - stRecvAt) / 1000)) : 0;
 
-/* ---------- timers config (mode-aware) ---------- */
+/* ---------- timers config ---------- */
 const TIMERS = [
-  { k: "cooldownLeftS",      name: "Auto cooldown",  mode: "auto" },
-  { k: "absenceLeftS",       name: "Absence delay",  mode: "auto" },
-  { k: "manualLimitLeftS",   name: "Manual limit",   mode: "manual" },
-  { k: "manualTimeoutLeftS", name: "Manual timeout", mode: "manual" }
+  { k: "cooldownLeftS",      name: "Auto cooldown",  mode: "AUTO" },
+  { k: "absenceLeftS",       name: "Absence delay",  mode: "AUTO" },
+  { k: "manualLimitLeftS",   name: "Manual limit",   mode: "MANUAL" },
+  { k: "manualTimeoutLeftS", name: "Manual timeout", mode: "MANUAL" },
+  { k: "timerLeftS",         name: "Timer remaining",mode: "TIMER" }
 ];
 $("rings").innerHTML = TIMERS.map(({k, name, mode}) =>
   `<div class="tr" data-mode="${mode}"><svg viewBox="0 0 60 60"><circle class="bg" cx="30" cy="30" r="26"/><circle class="fg" id="f_${k}" cx="30" cy="30" r="26"/></svg><span class="v" id="v_${k}">–</span><span class="mute">${name}</span></div>`
@@ -182,7 +190,6 @@ function startSession() {
   ang = 300;
   pending = null;
 
-  // Listen to Config
   unsubConfig = onValue(ref(db, BASE + "/config"), snap => {
     const v = snap.val();
     if (v) {
@@ -245,34 +252,37 @@ $("cfgAbsence").onchange = (e) => writeConfig("absenceDelayS", e.target.value);
 $("cfgCooldown").onchange = (e) => writeConfig("autoCooldownS", e.target.value);
 
 /* ---------- commands ---------- */
-function send(action) {
+function send(action, dur = 0) {
   if (pending) { toast("Please wait for the previous command to finish.", ""); return; }
   if (phase !== "LIVE" || !st) { toast("The system is not online right now.", "bad"); return; }
 
   // Validation
-  if ((action === "on" || action === "off") && !st.manual) {
-    toast("Switch to Manual override before turning the relay on or off.", "bad"); return;
+  if ((action === "on" || action === "off" || action === "timer_on") && st.mode !== "MANUAL" && st.mode !== "TIMER") {
+    toast("Switch to Manual override before controlling the relay.", "bad"); return;
   }
   if (action === "on"  &&  st.relayOn) { toast("Relay is already ON — nothing to change.", ""); return; }
   if (action === "off" && !st.relayOn) { toast("Relay is already OFF — nothing to change.", ""); return; }
-  if ((action === "on" || action === "off") && left("manualLimitLeftS") > 0) {
+  if ((action === "on" || action === "off" || action === "timer_on") && left("manualLimitLeftS") > 0) {
     toast("Wait " + left("manualLimitLeftS") + "s before trying again.", "bad"); return;
   }
-  if (action === "auto"     && !st.manual && !st.forceOff) { toast("Already in Auto mode.", ""); return; }
-  if (action === "override" &&  st.manual && !st.forceOff) { toast("Already in Manual override.", ""); return; }
-  if (action === "force_off" && st.forceOff) { toast("Already in Secure Off mode.", ""); return; }
+  if (action === "auto"     && st.mode === "AUTO") { toast("Already in Auto mode.", ""); return; }
+  if (action === "override" && st.mode === "MANUAL") { toast("Already in Manual override.", ""); return; }
+  if (action === "force_off" && st.mode === "SECURE_OFF") { toast("Already in Secure Off mode.", ""); return; }
 
   const id = Date.now();
+  const payload = { action, cmdId: id };
+  if (action === "timer_on") payload.duration = dur;
+
   pending = {
     id,
     action,
     since: Date.now(),
-    stateAtSend: { relayOn: !!st.relayOn, manual: !!st.manual, forceOff: !!st.forceOff }
+    stateAtSend: { relayOn: !!st.relayOn, mode: st.mode }
   };
 
   toast("Command sent. Waiting for the device…", "", 3000, "sending");
 
-  set(ref(db, BASE + "/control"), { action, cmdId: id })
+  set(ref(db, BASE + "/control"), payload)
     .catch(e => {
       if (!pending || pending.id !== id) return;
       clearTimeout(pending.timer);
@@ -285,6 +295,13 @@ function send(action) {
   pending.timer = setTimeout(() => onPendingTimeout(id), PENDING_TIMEOUT_MS);
   render();
 }
+function sendTimer(dur) { send("timer_on", dur); }
+
+// ADDED: Event listeners for the timer pills
+document.querySelectorAll('.timer-pill').forEach(btn => {
+  btn.onclick = () => sendTimer(parseInt(btn.dataset.dur));
+});
+
 $("segAuto").onclick   = () => send("auto");
 $("segManual").onclick = () => send("override");
 $("segLockout").onclick = () => send("force_off");
@@ -295,9 +312,10 @@ function stateMatches() {
   const b = pending.stateAtSend;
   if (pending.action === "on"        &&  st.relayOn && !b.relayOn) return true;
   if (pending.action === "off"       && !st.relayOn &&  b.relayOn) return true;
-  if (pending.action === "override"  &&  st.manual  && !b.manual ) return true;
-  if (pending.action === "force_off" &&  st.forceOff&& !b.forceOff)return true;
-  if (pending.action === "auto"      && !st.manual  && !st.forceOff && (b.manual || b.forceOff)) return true;
+  if (pending.action === "override"  &&  st.mode === "MANUAL"  && b.mode !== "MANUAL" ) return true;
+  if (pending.action === "force_off" &&  st.mode === "SECURE_OFF" && b.mode !== "SECURE_OFF") return true;
+  if (pending.action === "auto"      &&  st.mode === "AUTO" && b.mode !== "AUTO") return true;
+  if (pending.action === "timer_on"  &&  st.mode === "TIMER" && b.mode !== "TIMER") return true;
   return false;
 }
 
@@ -419,19 +437,22 @@ function updateStateBanner(now) {
 
 /* ---------- controls ---------- */
 function updateControls() {
-  const segA = $("segAuto"), segM = $("segManual"), segL = $("segLockout"), pow = $("bPower"), reason = $("powerReason");
+  const segA = $("segAuto"), segM = $("segManual"), segL = $("segLockout"), pow = $("bPower");
+  const timerBtns = document.querySelectorAll('.timer-pill');
+  const reason = $("powerReason");
   const cfgAbs = $("cfgAbsence"), cfgCoold = $("cfgCooldown");
   const lim = (phase === "LIVE" && st) ? left("manualLimitLeftS") : 0;
 
   // Pending: lock everything
   if (pending) {
     segA.disabled = segM.disabled = segL.disabled = pow.disabled = true;
+    timerBtns.forEach(b => b.disabled = true);
     segA.setAttribute("aria-pressed", "false"); segM.setAttribute("aria-pressed", "false"); segL.setAttribute("aria-pressed", "false");
     setBtn(segA, "Auto"); setBtn(segM, "Manual"); setBtn(segL, "Secure Off");
     if (pending.action === "auto") setBtn(segA, "Sending…");
     if (pending.action === "override") setBtn(segM, "Sending…");
     if (pending.action === "force_off") setBtn(segL, "Sending…");
-    if (pending.action === "on" || pending.action === "off") setBtn(pow, "Sending…");
+    if (pending.action === "on" || pending.action === "off" || pending.action === "timer_on") setBtn(pow, "Sending…");
     reason.textContent = "Waiting for the device to confirm…";
     cfgAbs.disabled = cfgCoold.disabled = true;
     return;
@@ -440,6 +461,7 @@ function updateControls() {
   // Not live: disable everything
   if (phase !== "LIVE" || !st) {
     segA.disabled = segM.disabled = segL.disabled = pow.disabled = true;
+    timerBtns.forEach(b => b.disabled = true);
     segA.setAttribute("aria-pressed", "false"); segM.setAttribute("aria-pressed", "false"); segL.setAttribute("aria-pressed", "false");
     setBtn(segA, "Auto"); setBtn(segM, "Manual"); setBtn(segL, "Secure Off");
     const on = !!st?.relayOn;
@@ -452,30 +474,36 @@ function updateControls() {
   }
 
   // Live
-  const manual = !!st.manual;
-  const lockout = !!st.forceOff;
+  const mode = st.mode || "AUTO";
+  const isAuto = mode === "AUTO";
+  const isManual = mode === "MANUAL";
+  const isSecure = mode === "SECURE_OFF";
+  const isTimer = mode === "TIMER";
 
-  segA.disabled = (!manual && !lockout) || !st.radarConnected;
-  segM.disabled = manual && !lockout;
-  segL.disabled = lockout;
+  segA.disabled = isAuto || !st.radarConnected;
+  segM.disabled = isManual;
+  segL.disabled = isSecure;
 
-  segA.setAttribute("aria-pressed", String(!manual && !lockout));
-  segM.setAttribute("aria-pressed", String(manual && !lockout));
-  segL.setAttribute("aria-pressed", String(lockout));
+  segA.setAttribute("aria-pressed", String(isAuto));
+  segM.setAttribute("aria-pressed", String(isManual));
+  segL.setAttribute("aria-pressed", String(isSecure));
 
   setBtn(segA, "Auto"); setBtn(segM, "Manual"); setBtn(segL, "Secure Off");
 
   const on = !!st.relayOn;
-  pow.disabled = !manual || lockout || lim > 0;
+  pow.disabled = (!isManual && !isTimer) || isSecure || lim > 0;
   setBtn(pow, lim > 0 ? `Wait ${lim}s…` : (on ? "Turn OFF" : "Turn ON"));
   pow.classList.toggle("primary", !on);
   pow.classList.toggle("danger", on);
 
+  timerBtns.forEach(b => b.disabled = (!isManual && !isTimer) || isSecure || lim > 0 || on);
+
   cfgAbs.disabled = false;
   cfgCoold.disabled = false;
 
-  if (lockout) reason.textContent = "Secure Off is active. The relay is permanently disabled.";
-  else if (!manual) reason.textContent = st.radarConnected ? "Switch to Manual to control the relay." : "Radar disconnected — running on manual fallback.";
+  if (isSecure) reason.textContent = "Secure Off is active. The relay is permanently disabled.";
+  else if (isTimer) reason.textContent = "Timer is running. Click Turn OFF to cancel early.";
+  else if (isAuto) reason.textContent = st.radarConnected ? "Switch to Manual to control the relay." : "Radar disconnected — running on manual fallback.";
   else if (lim > 0) reason.textContent = `Wait ${lim}s before changing the relay again.`;
   else reason.textContent = on ? "Relay is ON. Turn it off when you leave." : "Relay is OFF. Turn it on when needed.";
 }
@@ -528,7 +556,11 @@ function renderLive(now) {
     $("presTxt").classList.toggle("hot", present && live);
   }
 
-  $("relayLine").textContent = "Appliance power is " + (st.relayOn ? "on" : "off") + (st.manual ? ", controlled by you." : (st.forceOff ? ", securely off." : ", controlled automatically."));
+  const mode = st.mode || "AUTO";
+  $("relayLine").textContent = "Appliance power is " + (st.relayOn ? "on" : "off") + 
+    (mode === "MANUAL" ? ", controlled by you." : 
+    (mode === "SECURE_OFF" ? ", securely off." : 
+    (mode === "TIMER" ? ", on a timer." : ", controlled automatically.")));
 
   $("distTxt").innerHTML = present ? "Target at " + (st.detDist || 0) + " cm" : "&nbsp;";
   $("blip").style.opacity = (present && live) ? "1" : "0";
@@ -542,8 +574,9 @@ function renderLive(now) {
 
   // Pills
   let modeText = "◉ Auto mode", modeCls = "ok";
-  if (st.forceOff) { modeText = "⊘ Secure Off"; modeCls = "bad"; }
-  else if (st.manual) { modeText = "◎ Manual override"; modeCls = "warn"; }
+  if (mode === "SECURE_OFF") { modeText = "⊘ Secure Off"; modeCls = "bad"; }
+  else if (mode === "MANUAL") { modeText = "◎ Manual override"; modeCls = "warn"; }
+  else if (mode === "TIMER") { modeText = "⏱ Timer"; modeCls = "warn"; }
   setPill($("modePill"), modeText, modeCls);
 
   setPill($("outPill"), (st.outHigh ? "▲ OUT high" : "▼ OUT low"), st.outHigh ? "ok" : "");
@@ -553,8 +586,9 @@ function renderLive(now) {
   $("bulb").classList.toggle("on", !!st.relayOn);
   $("relayTxt").textContent = st.relayOn ? "Power ON" : "Power OFF";
   
-  if (st.forceOff) $("modeHint").textContent = "System secured";
-  else if (st.manual) $("modeHint").textContent = "Back to Auto in " + left("manualTimeoutLeftS") + "s";
+  if (mode === "SECURE_OFF") $("modeHint").textContent = "System secured";
+  else if (mode === "TIMER") $("modeHint").textContent = "Ends in " + fmtTimer(st.timerLeftS);
+  else if (mode === "MANUAL") $("modeHint").textContent = "Back to Auto in " + left("manualTimeoutLeftS") + "s";
   else $("modeHint").textContent = "Click Manual to take control";
 
   // Radar energy
@@ -564,24 +598,19 @@ function renderLive(now) {
   $("staB").style.width = Math.min(100, st.stationary || 0) + "%";
 
   // Timers
-  const activeMode = st.manual ? "manual" : "auto";
   document.querySelectorAll("#rings .tr").forEach(tr => {
-    tr.hidden = tr.dataset.mode !== activeMode;
+    tr.hidden = tr.dataset.mode !== mode;
   });
   for (const {k} of TIMERS) {
     let v = left(k);
     let max = 1; 
-
-    // Determine the 100% mark based on current settings
     if (k === "cooldownLeftS") max = localConfig.autoCooldownS || 15;
     else if (k === "absenceLeftS") max = localConfig.absenceDelayS || 30;
     else if (k === "manualLimitLeftS") max = 7;
     else if (k === "manualTimeoutLeftS") max = 120;
+    else if (k === "timerLeftS") max = st.timerDurationS || 1;
 
-    if (k === "manualTimeoutLeftS" && !st.manual) v = 0;
-    
-    $("v_" + k).textContent = v;
-    // Calculate the offset. 163.4 is the full circumference of the circle.
+    $("v_" + k).textContent = (k === "timerLeftS") ? fmtTimer(v) : v;
     $("f_" + k).style.strokeDashoffset = 163.4 * (1 - Math.min(1, v / max));
   }
 
@@ -629,9 +658,16 @@ function describe(e) {
   const changedStr = typeof e.changed === "string" ? e.changed : String(e.changed ?? "");
   const ch = changedStr.split(",");
   if (ch.includes("relay")) parts.push(e.relayOn ? "Relay turned ON" : "Relay turned OFF");
-  if (ch.includes("mode")) parts.push(e.manual ? "Switched to Manual override" : "Switched to Auto mode");
-  if (ch.includes("lockout")) parts.push(e.forceOff ? "Switched to Secure Off" : "Secure Off disabled");
+  if (ch.includes("mode")) {
+    if (e.mode === "MANUAL") parts.push("Switched to Manual");
+    else if (e.mode === "TIMER") parts.push("Timer started");
+    else if (e.mode === "SECURE_OFF") parts.push("Switched to Secure Off");
+    else parts.push("Switched to Auto");
+  }
   if (ch.includes("presence")) parts.push(e.presence ? "Person detected" : "Room became empty");
+  // ADD THIS LINE:
+  if (ch.includes("radar")) parts.push(e.radarConnected ? "Radar reconnected" : "Radar signal lost");
+  
   if (e.cmdResult && e.cmdResult > 2) parts.push("Command rejected (code " + e.cmdResult + ")");
   return parts.length ? parts.join(" · ") : (changedStr || "Event");
 }
@@ -645,7 +681,7 @@ function paintLog() {
   if (!Array.isArray(latestLog) || latestLog.length === 0) {
     const li = document.createElement("li");
     li.className = "mute";
-    li.textContent = phase === "OFFLINE" ? "No events cached." : "No events yet.";
+    li.textContent = phase === "OFFLINE" ? "No activity cached." : "No activity yet.";
     frag.append(li);
   } else {
     latestLog.forEach((e, i) => {
@@ -655,7 +691,7 @@ function paintLog() {
         seenLog.add(e.k);
         const cls = [];
         if (e.cmdResult > 2) cls.push("bad");
-        else if ((e.changed || "").includes("relay") || (e.changed || "").includes("lockout")) cls.push("ok");
+        else if ((e.changed || "").includes("relay") || (e.changed || "").includes("mode")) cls.push("ok");
         if (isNew) cls.push("new");
         li.className = cls.join(" ");
         if (isNew) li.style.animationDelay = Math.min(i, 12) * 60 + "ms";

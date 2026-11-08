@@ -81,10 +81,7 @@ button.primary:hover:not(:disabled){box-shadow:0 0 26px rgba(46,168,255,.6)}
 button.danger:hover:not(:disabled){border-color:var(--bad);box-shadow:0 0 22px rgba(255,107,122,.4)}
 
 button.primary:disabled, button.danger:disabled {
-  background: rgba(255,255,255,.05);
-  border-color: rgba(120,190,230,.3);
-  color: var(--ink);
-  box-shadow: none;
+  background: rgba(255,255,255,.05); border-color: rgba(120,190,230,.3); color: var(--ink); box-shadow: none;
 }
 
 .rip{position:absolute;border-radius:50%;background:rgba(255,255,255,.4);transform:scale(0);animation:rip .6s ease-out forwards;pointer-events:none}
@@ -161,8 +158,6 @@ main{max-width:1120px;margin:0 auto;padding:0 1.5rem 3rem;display:grid;gap:1.25r
 .seg-btn{border:1px solid transparent!important;background:transparent;padding:.55rem 1rem;border-radius:999px;flex:1;font-size:.85rem;transition:background .3s,color .3s,box-shadow .3s}
 .seg-btn[aria-pressed="true"]{background:linear-gradient(120deg,var(--blue-deep),var(--blue));color:#fff;box-shadow:0 4px 20px rgba(46,168,255,.4)}
 .seg-btn:hover:not(:disabled):not([aria-pressed="true"]){border-color:var(--ice)!important;box-shadow:none}
-
-/* Secure Off mode special styling */
 #segLockout[aria-pressed="true"] { background: linear-gradient(120deg, #cc2a3a, var(--bad)); box-shadow: 0 4px 20px rgba(255,107,122,.4); color:#fff;}
 
 /* power button */
@@ -171,6 +166,11 @@ main{max-width:1120px;margin:0 auto;padding:0 1.5rem 3rem;display:grid;gap:1.25r
 .power-btn.primary:hover:not(:disabled){box-shadow:0 0 26px rgba(46,168,255,.6)}
 .power-btn.danger{background:rgba(255,107,122,.1);border-color:var(--bad);color:var(--bad)}
 .power-btn.danger:hover:not(:disabled){background:rgba(255,107,122,.18);box-shadow:0 0 22px rgba(255,107,122,.4)}
+
+/* Timer Pills */
+.timer-pills { display: flex; gap: .5rem; margin-top: .8rem; justify-content: space-between; }
+.timer-pill { padding: .4rem .5rem; font-size: .75rem; flex: 1; border-radius: 8px; border: 1px solid rgba(120,190,230,.3); transition: all .2s; }
+.timer-pill:hover:not(:disabled) { border-color: var(--ice); background: rgba(46,168,255,.1); }
 
 .reason{font-size:.8rem;color:var(--mute);margin-top:.7rem;min-height:1.2em;line-height:1.4}
 
@@ -183,13 +183,19 @@ main{max-width:1120px;margin:0 auto;padding:0 1.5rem 3rem;display:grid;gap:1.25r
 .bar.s i{background:linear-gradient(90deg,var(--green-dim),var(--green))}
 
 .rings{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:1rem}
-.tr{text-align:center;transition:opacity .4s}
+.tr{text-align:center;transition:opacity .4s;position:relative}
 .tr[hidden]{display:none}
-.tr svg{width:84px;height:84px;transform:rotate(-90deg)}
+.tr svg{width:100px;height:100px;transform:rotate(-90deg);margin:0 auto;display:block}
 .tr circle{fill:none;stroke-width:6;stroke-linecap:round}
 .tr .bg{stroke:rgba(255,255,255,.07)}
 .tr .fg{stroke:url(#g);stroke-dasharray:163.4;stroke-dashoffset:163.4;transition:stroke-dashoffset 1s linear}
-.tr .v{display:block;margin-top:-62px;height:62px;font:900 1.5rem/62px "Big Shoulders Display",Impact,sans-serif}
+.tr .v{
+  position:absolute;top:0;left:0;right:0;
+  height:100px;
+  display:flex;align-items:center;justify-content:center;
+  font:900 1.15rem "Big Shoulders Display",Impact,sans-serif;
+  white-space:nowrap;pointer-events:none;
+}
 .tr .mute{display:block;margin-top:.4rem}
 
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:1rem}

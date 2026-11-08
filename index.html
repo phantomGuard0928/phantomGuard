@@ -74,7 +74,17 @@
         <button class="seg-btn" id="segLockout" aria-pressed="false" disabled>Secure Off</button>
       </div>
       <div class="power"><div class="bulb" id="bulb"></div><div><b id="relayTxt">Initializing…</b><span class="mute" id="modeHint"></span></div></div>
+      
       <button class="power-btn primary" id="bPower" disabled>Turn ON</button>
+      
+      <div class="timer-pills" id="timerPills">
+        <button class="timer-pill" data-dur="900" disabled>15m</button>
+        <button class="timer-pill" data-dur="1800" disabled>30m</button>
+        <button class="timer-pill" data-dur="3600" disabled>1h</button>
+        <button class="timer-pill" data-dur="7200" disabled>2h</button>
+        <button class="timer-pill" data-dur="18000" disabled>5h</button>
+      </div>
+
       <p class="reason" id="powerReason" aria-live="polite"></p>
     </section>
 
@@ -117,7 +127,7 @@
     </section>
 
     <section class="card c-log in" style="--i:7" id="cardLog">
-      <h2>History</h2>
+      <h2>Recent Activity</h2>
       <ul class="tl" id="log" aria-live="polite"><li class="mute">No events yet.</li></ul>
     </section>
   </main>
