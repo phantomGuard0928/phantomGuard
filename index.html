@@ -225,13 +225,21 @@ main{max-width:1120px;margin:0 auto;padding:0 1.5rem 3rem;display:grid;gap:1.25r
 .setting-row { display: flex; justify-content: space-between; align-items: center; padding: .8rem 0; border-bottom: 1px solid rgba(255,255,255,.05); }
 .setting-row:last-child { border-bottom: none; }
 .setting-row label { font-weight: 600; font-size: .9rem; }
-.setting-row select { 
+.setting-row select, .setting-row input[type="time"] { 
   font: 700 .85rem Manrope, sans-serif; color: var(--ink); background: rgba(255,255,255,.05); 
   border: 1px solid rgba(120,190,230,.3); padding: .4rem .8rem; border-radius: 8px; outline: none; cursor: pointer; transition: all .3s;
 }
-.setting-row select:hover { border-color: var(--ice); }
-.setting-row select:focus { border-color: var(--blue); box-shadow: 0 0 10px rgba(46,168,255,.3); }
+.setting-row select:hover, .setting-row input[type="time"]:hover { border-color: var(--ice); }
+.setting-row select:focus, .setting-row input[type="time"]:focus { border-color: var(--blue); box-shadow: 0 0 10px rgba(46,168,255,.3); }
 .setting-row select option { background: var(--bg); color: var(--ink); }
+
+/* Toggle Switch */
+.switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+.switch input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,.1); transition: .4s; border-radius: 34px; border: 1px solid rgba(120,190,230,.3); }
+.slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: var(--mute); transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: var(--blue-deep); border-color: var(--blue); }
+input:checked + .slider:before { transform: translateX(20px); background-color: #fff; }
 
 ul.tl{list-style:none;margin:0;padding:0 0 0 1.2rem;border-left:2px solid rgba(120,190,230,.2);max-height:380px;overflow:auto;transition:opacity .4s}
 ul.tl.dim{opacity:.5}
@@ -392,6 +400,27 @@ ul.tl li.new{animation:slide .7s cubic-bezier(.2,.8,.2,1)}
           <option value="60">1 minute</option>
         </select>
       </div>
+      
+      <div class="setting-row" style="margin-top: 1rem; border-top: 1px solid rgba(255,255,255,.05); padding-top: 1rem;">
+        <label style="display:flex; align-items:center; gap:.5rem; cursor:pointer;">
+          Sleep Mode
+        </label>
+        <label class="switch">
+          <input type="checkbox" id="cfgSleepEnabled" disabled>
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div id="sleepTimeRow" style="display:flex; gap:.5rem; padding-top:.5rem; opacity:0.5; pointer-events:none;">
+        <div style="flex:1;">
+          <div class="mute" style="font-size:.75rem; margin-bottom:.2rem;">Start Time</div>
+          <input type="time" id="cfgSleepStart" style="width:100%;" disabled>
+        </div>
+        <div style="flex:1;">
+          <div class="mute" style="font-size:.75rem; margin-bottom:.2rem;">End Time</div>
+          <input type="time" id="cfgSleepEnd" style="width:100%;" disabled>
+        </div>
+      </div>
+      <div id="sleepError" class="mute" style="color: var(--bad); font-size:.75rem; display:none; margin-top:.3rem;">Sleep mode cannot exceed 10 hours.</div>
     </section>
 
     <section class="card c-log in" style="--i:7" id="cardLog">
@@ -443,7 +472,7 @@ let unsubLog = null;
 let unsubConfig = null;
 let tickInterval = null;
 
-let localConfig = { absenceDelayS: 30, autoCooldownS: 15 };
+let localConfig = { absenceDelayS: 30, autoCooldownS: 15, sleepEnabled: false, sleepStartMin: 1320, sleepEndMin: 420 };
 
 /* ---------- a11y announcer ---------- */
 let srTimer;
@@ -529,6 +558,17 @@ const relTime = ts => {
 };
 const left = k => st ? Math.max(0, (st[k] || 0) - Math.floor((Date.now() - stRecvAt) / 1000)) : 0;
 
+// Time conversions for Sleep Mode
+const minToTimeStr = (min) => {
+  const h = Math.floor(min / 60);
+  const m = min % 60;
+  return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+};
+const timeStrToMin = (str) => {
+  const [h, m] = str.split(':').map(Number);
+  return h * 60 + m;
+};
+
 /* ---------- timers config ---------- */
 const TIMERS = [
   { k: "cooldownLeftS",      name: "Auto cooldown",  mode: "AUTO" },
@@ -601,6 +641,12 @@ function startSession() {
       localConfig = v;
       $("cfgAbsence").value = v.absenceDelayS || 30;
       $("cfgCooldown").value = v.autoCooldownS || 15;
+      
+      // Sleep Mode
+      $("cfgSleepEnabled").checked = !!v.sleepEnabled;
+      $("cfgSleepStart").value = minToTimeStr(v.sleepStartMin !== undefined ? v.sleepStartMin : 1320);
+      $("cfgSleepEnd").value = minToTimeStr(v.sleepEndMin !== undefined ? v.sleepEndMin : 420);
+      toggleSleepUI();
     }
   });
 
@@ -656,12 +702,55 @@ function writeConfig(key, val) {
 $("cfgAbsence").onchange = (e) => writeConfig("absenceDelayS", e.target.value);
 $("cfgCooldown").onchange = (e) => writeConfig("autoCooldownS", e.target.value);
 
+function toggleSleepUI() {
+  const enabled = $("cfgSleepEnabled").checked;
+  const row = $("sleepTimeRow");
+  const start = $("cfgSleepStart");
+  const end = $("cfgSleepEnd");
+  
+  start.disabled = !enabled;
+  end.disabled = !enabled;
+  row.style.opacity = enabled ? "1" : "0.5";
+  row.style.pointerEvents = enabled ? "auto" : "none";
+}
+
+function saveSleepConfig() {
+  const enabled = $("cfgSleepEnabled").checked;
+  const startStr = $("cfgSleepStart").value;
+  const endStr = $("cfgSleepEnd").value;
+  
+  if (!startStr || !endStr) return;
+  
+  const startMin = timeStrToMin(startStr);
+  const endMin = timeStrToMin(endStr);
+  const duration = (endMin - startMin + 1440) % 1440;
+  
+  if (enabled && (duration === 0 || duration > 600)) {
+    $("sleepError").style.display = "block";
+    return;
+  }
+  $("sleepError").style.display = "none";
+  
+  const updates = {
+    sleepEnabled: enabled,
+    sleepStartMin: startMin,
+    sleepEndMin: endMin
+  };
+  
+  set(ref(db, BASE + "/config"), { ...localConfig, ...updates })
+    .then(() => toast("Sleep mode saved.", "ok"))
+    .catch(e => toast("Failed to save: " + e.message, "bad"));
+}
+
+$("cfgSleepEnabled").onchange = () => { toggleSleepUI(); saveSleepConfig(); };
+$("cfgSleepStart").onchange = saveSleepConfig;
+$("cfgSleepEnd").onchange = saveSleepConfig;
+
 /* ---------- commands ---------- */
 function send(action, dur = 0) {
   if (pending) { toast("Please wait for the previous command to finish.", ""); return; }
   if (phase !== "LIVE" || !st) { toast("The system is not online right now.", "bad"); return; }
 
-  // Validation
   if ((action === "on" || action === "off" || action === "timer_on") && st.mode !== "MANUAL" && st.mode !== "TIMER") {
     toast("Switch to Manual override before controlling the relay.", "bad"); return;
   }
@@ -702,7 +791,6 @@ function send(action, dur = 0) {
 }
 function sendTimer(dur) { send("timer_on", dur); }
 
-// ADDED: Event listeners for the timer pills
 document.querySelectorAll('.timer-pill').forEach(btn => {
   btn.onclick = () => sendTimer(parseInt(btn.dataset.dur));
 });
@@ -846,6 +934,7 @@ function updateControls() {
   const timerBtns = document.querySelectorAll('.timer-pill');
   const reason = $("powerReason");
   const cfgAbs = $("cfgAbsence"), cfgCoold = $("cfgCooldown");
+  const cfgSleep = $("cfgSleepEnabled"), cfgSleepStart = $("cfgSleepStart"), cfgSleepEnd = $("cfgSleepEnd");
   const lim = (phase === "LIVE" && st) ? left("manualLimitLeftS") : 0;
 
   // Pending: lock everything
@@ -859,7 +948,7 @@ function updateControls() {
     if (pending.action === "force_off") setBtn(segL, "Sending…");
     if (pending.action === "on" || pending.action === "off" || pending.action === "timer_on") setBtn(pow, "Sending…");
     reason.textContent = "Waiting for the device to confirm…";
-    cfgAbs.disabled = cfgCoold.disabled = true;
+    cfgAbs.disabled = cfgCoold.disabled = cfgSleep.disabled = cfgSleepStart.disabled = cfgSleepEnd.disabled = true;
     return;
   }
 
@@ -874,7 +963,7 @@ function updateControls() {
     pow.classList.toggle("primary", !on);
     pow.classList.toggle("danger", on);
     reason.textContent = phase === "OFFLINE" ? "Waiting for the device to come back online." : "Waiting for the device to check in.";
-    cfgAbs.disabled = cfgCoold.disabled = true;
+    cfgAbs.disabled = cfgCoold.disabled = cfgSleep.disabled = cfgSleepStart.disabled = cfgSleepEnd.disabled = true;
     return;
   }
 
@@ -905,6 +994,14 @@ function updateControls() {
 
   cfgAbs.disabled = false;
   cfgCoold.disabled = false;
+  cfgSleep.disabled = false;
+  if ($("cfgSleepEnabled").checked) {
+    cfgSleepStart.disabled = false;
+    cfgSleepEnd.disabled = false;
+  } else {
+    cfgSleepStart.disabled = true;
+    cfgSleepEnd.disabled = true;
+  }
 
   if (isSecure) reason.textContent = "Secure Off is active. The relay is permanently disabled.";
   else if (isTimer) reason.textContent = "Timer is running. Click Turn OFF to cancel early.";
@@ -1070,10 +1167,24 @@ function describe(e) {
     else parts.push("Switched to Auto");
   }
   if (ch.includes("presence")) parts.push(e.presence ? "Person detected" : "Room became empty");
-  // ADD THIS LINE:
   if (ch.includes("radar")) parts.push(e.radarConnected ? "Radar reconnected" : "Radar signal lost");
   
-  if (e.cmdResult && e.cmdResult > 2) parts.push("Command rejected (code " + e.cmdResult + ")");
+  if (ch.includes("cmd")) {
+    let act = e.cmdAction || "Command";
+    if (act === "override") act = "Manual mode";
+    else if (act === "force_off") act = "Secure Off";
+    else if (act === "timer_on") act = "Timer";
+    else if (act === "auto") act = "Auto mode";
+    else if (act === "on") act = "Turn ON";
+    else if (act === "off") act = "Turn OFF";
+
+    if (e.cmdResult === 2) parts.push(`No change needed (${act})`);
+    else if (e.cmdResult === 3) parts.push(`Blocked: Rate limited (${act})`);
+    else if (e.cmdResult === 4) parts.push(`Blocked: Wrong mode (${act})`);
+    else if (e.cmdResult === 5) parts.push(`Unknown command (${act})`);
+    else if (e.cmdResult === 1 && parts.length === 0) parts.push(`Applied: ${act}`);
+  }
+
   return parts.length ? parts.join(" · ") : (changedStr || "Event");
 }
 
